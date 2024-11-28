@@ -8,6 +8,10 @@ namespace py = pybind11;
 
 namespace FittingAlgorithms{
   namespace GaussNewton {
-    void registerGaussNewton(py::module_& m);   
+    void registerGNParameters(py::module_& module);    
+    void registerFitResult(py::module_& module);
+    void registerFitScalar(py::module_& module);
+    void registerFitVector(py::module_& module);
+    void registerGaussNewton(py::module_& module);
   }
 }

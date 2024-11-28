@@ -7,7 +7,7 @@
 
 namespace FittingAlgorithms{
   namespace GaussNewton{
-  
+
     // Function to convert std::map<std::string, double> to Eigen::VectorXd
     vector mapToEigen(const std::map<std::string, double>& initialGuesses) {
       
@@ -93,17 +93,39 @@ namespace FittingAlgorithms{
     //   return fittingParamsMap;
     // }
 
+
+    
+    template <typename T>
+    vector computeResiduals(std::vector<T> &xdata_in,
+                            std::vector<double> &ydata_in,
+                            ModelFunction<T> model,
+                            CostFunction costFunction,
+                            std::map<std::string, double>& fittingParameters,
+                            std::map<std::string, double>& extraParameters){
+      
+      std::vector<double> y_predV = model(xdata_in, fittingParameters, extraParameters);
+      vector residuals(y_predV.size());
+      for(int i = 0; i<ydata_in.size(); i++){
+        residuals(i) = -sqrt(costFunction(ydata_in[i], y_predV[i]));
+      }
+      return residuals;
+    }
+    
+    
     // Function to compute the Jacobian matrix numerically using finite differences
-    template <typename T1, typename Model>
-    Eigen::MatrixXd computeJacobian(Model model,
-                                    std::vector<T1> &xdata_in,
+    template <typename T>
+    Eigen::MatrixXd computeJacobian(std::vector<T> &xdata_in,
                                     std::vector<double> &ydata_in,
+                                    ModelFunction<T> model,
+                                    CostFunction costFunction,
                                     std::map<std::string, double> &paramsMap,
                                     std::map<std::string, double> &extraParameters) {
       // Create a map to store perturbed parameters
       std::map<std::string, double> perturbedParams = paramsMap;
-    
-      std::vector<double> y_predBase = model(xdata_in, ydata_in, paramsMap, extraParameters);
+      
+      vector y_predBase = computeResiduals(xdata_in, ydata_in,
+                                           model, costFunction,
+                                           paramsMap, extraParameters);
       int m = y_predBase.size();
       int n = paramsMap.size();
       Eigen::MatrixXd J(m, n);
@@ -112,42 +134,44 @@ namespace FittingAlgorithms{
       for (const auto& param : paramsMap) {
         double originalValue = param.second;
         perturbedParams[param.first] = originalValue + EPSILON;
-        std::vector<double> y_predPerturbed = model(xdata_in, ydata_in, perturbedParams, extraParameters);
+        vector y_predPerturbed = computeResiduals(xdata_in, ydata_in,
+                                                  model, costFunction,
+                                                  perturbedParams, extraParameters);
       
         perturbedParams[param.first] = originalValue;
-        for (int i = 0; i < m; ++i) {
-          J(i, col) = (y_predPerturbed[i] - y_predBase[i]) / EPSILON;
-        }
-      
+        J.col(col) = (y_predPerturbed - y_predBase) / EPSILON;
         ++col;
       }
       return J;
     }
   
-    template<typename T1, typename Model>
-    matrix computePseudoJacobian(Model model,
-                                 std::vector<T1> &xdata_in,
+    template<typename T>
+    matrix computePseudoJacobian(std::vector<T> &xdata_in,
                                  std::vector<double> &ydata_in,
-                                 GNParameters params,
+                                 ModelFunction<T> model,
+                                 CostFunction costFunction,
+                                 double regularization,
                                  std::map<std::string, double> &paramsMap,
                                  std::map<std::string, double> &extraParameters) {
     
     
       int nParams           = paramsMap.size();
-      matrix regularization = Eigen::MatrixXd::Identity(nParams, nParams) * params.regularization;
-      matrix J              = computeJacobian(model, xdata_in, ydata_in, paramsMap, extraParameters);
-      matrix JTJ            = J.transpose() * J + regularization;
+      matrix R              = Eigen::MatrixXd::Identity(nParams, nParams) * regularization;
+      matrix J              = computeJacobian(xdata_in, ydata_in, model, costFunction,
+                                              paramsMap, extraParameters);
+      matrix JTJ            = J.transpose() * J + R;
       Eigen::LDLT<matrix> ldlt(JTJ);
     
       matrix pseudoJ = ldlt.solve(J.transpose());
       return pseudoJ;
     }
 
-    template<typename T1, typename Model>
-    std::map<std::string, double> computeStandardErrors(Model model,
-                                                        std::vector<T1> &xdata_in,
+    template<typename T>
+    std::map<std::string, double> computeStandardErrors(std::vector<T> &xdata_in,
                                                         std::vector<double> &ydata_in,
-                                                        GNParameters params,
+                                                        ModelFunction<T> model,
+                                                        CostFunction costFunction,
+                                                        double regularization,
                                                         std::map<std::string, double> &paramsMap,
                                                         std::map<std::string, double> &extraParameters,
                                                         vector residual){
@@ -156,11 +180,13 @@ namespace FittingAlgorithms{
       int nParams        = paramsMap.size();
       double residualSum = residual.squaredNorm();
       double variance    = residualSum / (ydata_in.size() - nParams);
-
-      matrix regularization = Eigen::MatrixXd::Identity(nParams, nParams) * params.regularization;
-      matrix J              = computeJacobian(model, xdata_in, ydata_in, paramsMap, extraParameters);      
-      matrix JTJ            = J.transpose() * J + regularization;
-      matrix JTJ_inv        = JTJ.inverse();
+      matrix R           = Eigen::MatrixXd::Identity(nParams, nParams) * regularization;
+      matrix J           = computeJacobian(xdata_in, ydata_in, model,
+                                           costFunction, paramsMap,
+                                           extraParameters);
+      
+      matrix JTJ         = J.transpose() * J + R;
+      matrix JTJ_inv     = JTJ.inverse();
     
       for (int i = 0; i < nParams; ++i) {
         errors[std::next(paramsMap.begin(), i)->first] = std::sqrt(variance * JTJ_inv(i, i));
@@ -172,8 +198,8 @@ namespace FittingAlgorithms{
     FitResult fit(std::vector<T>& xdata_in,
                   std::vector<double>& ydata_in,
                   GNParameters gnParams,
-                  std::function<std::vector<double>(const std::vector<T>&, const std::vector<double>&,
-                                                    const std::map<std::string, double>&, const std::map<std::string, double>&)> model,
+                  ModelFunction<T> model,
+                  CostFunction costFunction,
                   std::map<std::string, double>& initialGuesses,
                   std::map<std::string, double>& extraParameters){
       
@@ -185,11 +211,15 @@ namespace FittingAlgorithms{
     
       vector residual;
       for (int i = 0; i < gnParams.maxIterations; ++i) {
-        std::vector<double> y_predV = model(xdata_in, ydata_in, fittingParamsMap, extraParameters);
-      
-        residual            = -Eigen::Map<const vector>(y_predV.data(), y_predV.size());
-        matrix pseudoJ      = computePseudoJacobian(model, xdata_in, ydata_in,
-                                                    gnParams, fittingParamsMap,
+        
+        residual = computeResiduals(xdata_in, ydata_in,
+                                    model, costFunction,
+                                    fittingParamsMap, extraParameters);
+        
+        matrix pseudoJ      = computePseudoJacobian(xdata_in, ydata_in,
+                                                    model, costFunction,
+                                                    gnParams.regularization,
+                                                    fittingParamsMap,
                                                     extraParameters);
         vector delta_params = pseudoJ * residual;
         double currentError = (delta_params.array() / fittingParams.array()).matrix().norm()/n;
@@ -205,8 +235,10 @@ namespace FittingAlgorithms{
         }
       }
 
-      auto errors = computeStandardErrors(model, xdata_in, ydata_in,
-                                          gnParams,fittingParamsMap,
+      auto errors = computeStandardErrors(xdata_in, ydata_in,
+                                          model, costFunction,
+                                          gnParams.regularization,
+                                          fittingParamsMap,
                                           extraParameters,
                                           residual);
     
@@ -216,21 +248,23 @@ namespace FittingAlgorithms{
     FitResult fitScalar(std::vector<double>& xdata_in,
                         std::vector<double>& ydata_in,
                         GNParameters gnParams,
-                        std::function<std::vector<double>(const std::vector<double>&, const std::vector<double>&,
-                                                          const std::map<std::string, double>&, const std::map<std::string, double>&)> model,
+                        ModelFunction<double> model,
+                        CostFunction costFunction,
                         std::map<std::string, double>& initialGuesses,
                         std::map<std::string, double>& extraParameters){
-      return fit<double>(xdata_in, ydata_in, gnParams, model, initialGuesses, extraParameters);
+      return fit<double>(xdata_in, ydata_in, gnParams, model,
+                         costFunction, initialGuesses, extraParameters);
 }
 
     FitResult fitVector(std::vector<std::vector<double>>& xdata_in,
                         std::vector<double>& ydata_in,
                         GNParameters gnParams,
-                        std::function<std::vector<double>(const std::vector<std::vector<double>>&, const std::vector<double>&,
-                                                          const std::map<std::string, double>&, const std::map<std::string, double>&)> model,
+                        ModelFunction<std::vector<double>> model,
+                        CostFunction costFunction,
                         std::map<std::string, double>& initialGuesses,
                         std::map<std::string, double>& extraParameters){
-      return fit<std::vector<double>>(xdata_in, ydata_in, gnParams, model, initialGuesses, extraParameters);
+      return fit<std::vector<double>>(xdata_in, ydata_in, gnParams, model,
+                                      costFunction, initialGuesses, extraParameters);
     }   
   }
 }

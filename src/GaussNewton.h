@@ -12,6 +12,13 @@ namespace FittingAlgorithms {
     using vector = Eigen::VectorXd;
     using matrix = Eigen::MatrixXd;
     
+    using CostFunction = std::function<double(const double, const double)>;
+    
+    template <typename T>
+    using ModelFunction = std::function<std::vector<double>(const std::vector<T>&,
+                                                            const std::map<std::string, double>&,
+                                                            const std::map<std::string, double>&)>;
+  
     constexpr double EPSILON = sqrt(std::numeric_limits<double>::epsilon());
     
     struct GNParameters{
@@ -29,59 +36,57 @@ namespace FittingAlgorithms {
     Eigen::VectorXd mapToEigen(const std::map<std::string, double>& params);
     void updateMapFromEigen(std::map<std::string, double>& params, const Eigen::VectorXd& values);
     void printParameters(const std::map<std::string, double>& params, int precision = 6);
-    template <typename T1, typename Model>
-      Eigen::MatrixXd computeJacobian(
-                                      Model model,
-                                      std::vector<T1>& xdata_in,
-                                      std::vector<double>& ydata_in,
-                                      std::map<std::string, double>& paramsMap,
-                                      std::map<std::string, double>& extraParameters);
-    
-    template <typename T1, typename Model>
-      Eigen::MatrixXd computePseudoJacobian(
-                                            Model model,
-                                            std::vector<T1>& xdata_in,
-                                            std::vector<double>& ydata_in,
-                                            GNParameters params,
-                                            std::map<std::string, double>& paramsMap,
-                                            std::map<std::string, double>& extraParameters);
-    
-    template <typename T1, typename Model>
-      std::map<std::string, double> computeStandardErrors(
-                                                          Model model,
-                                                          std::vector<T1>& xdata_in,
-                                                          std::vector<double>& ydata_in,
-                                                          GNParameters params,
-                                                          std::map<std::string, double>& paramsMap,
-                                                          std::map<std::string, double>& extraParameters,
-                                                          Eigen::VectorXd residual);
 
-    template <typename T1>
-    FitResult fit(std::vector<T1>& xdata_in,
+    template <typename T>
+    Eigen::MatrixXd computeJacobian(std::vector<T> &xdata_in,
+                                    std::vector<double> &ydata_in,
+                                    ModelFunction<T> model,
+                                    CostFunction costFunction,
+                                    std::map<std::string, double> &paramsMap,
+                                    std::map<std::string, double> &extraParameters);
+    
+    template <typename T>
+    Eigen::MatrixXd computePseudoJacobian(std::vector<T>& xdata_in,
+                                          std::vector<double>& ydata_in,
+                                          ModelFunction<T> model,
+                                          CostFunction costFunction,
+                                          double regularization,
+                                          std::map<std::string, double>& paramsMap,
+                                          std::map<std::string, double>& extraParameters);
+
+    template<typename T>
+    std::map<std::string, double> computeStandardErrors(std::vector<T> &xdata_in,
+                                                        std::vector<double> &ydata_in,
+                                                        ModelFunction<T> model,
+                                                        CostFunction costFunction,
+                                                        double regularization,
+                                                        std::map<std::string, double> &paramsMap,
+                                                        std::map<std::string, double> &extraParameters,
+                                                        vector residual);
+    
+    template <typename T>
+    FitResult fit(std::vector<T>& xdata_in,
                   std::vector<double>& ydata_in,
                   GNParameters gnParams,
-                  std::function<std::vector<double>(const std::vector<T1>&, const std::vector<double>&,
-                                                    const std::map<std::string, double>&, const std::map<std::string, double>&)> model,
+                  ModelFunction<T> model,
+                  CostFunction costFunction,
                   std::map<std::string, double>& initialGuesses,
                   std::map<std::string, double>& extraParameters);
-
     
     FitResult fitScalar(std::vector<double>& xdata_in,
                         std::vector<double>& ydata_in,
                         GNParameters gnParams,
-                        std::function<std::vector<double>(const std::vector<double>&, const std::vector<double>&,
-                                                          const std::map<std::string, double>&, const std::map<std::string, double>&)> model,
+                        ModelFunction<double> model,
+                        CostFunction costFunction,
                         std::map<std::string, double>& initialGuesses,
                         std::map<std::string, double>& extraParameters);
-
+    
     FitResult fitVector(std::vector<std::vector<double>>& xdata_in,
                         std::vector<double>& ydata_in,
                         GNParameters gnParams,
-                        std::function<std::vector<double>(const std::vector<std::vector<double>>&, const std::vector<double>&,
-                                                          const std::map<std::string, double>&, const std::map<std::string, double>&)> model,
+                        ModelFunction<std::vector<double>> model,
+                        CostFunction costFunction,
                         std::map<std::string, double>& initialGuesses,
                         std::map<std::string, double>& extraParameters);
-    
-    
   } 
 } 
