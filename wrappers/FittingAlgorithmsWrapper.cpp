@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 #include "GaussNewtonWrapper.h"
-
+#include "utils/costFunctionsWrapper.h"
 namespace py = pybind11;
 
 PYBIND11_MODULE(FittingAlgorithms, m) {
@@ -10,4 +10,5 @@ PYBIND11_MODULE(FittingAlgorithms, m) {
   // Registrar el submódulo Gauss-Newton
   auto gaussNewton = m.def_submodule("GaussNewton", "Gauss-Newton fitting algorithm");
   FittingAlgorithms::GaussNewton::registerGaussNewton(gaussNewton);
+  FittingAlgorithms::registerCostFunctions(m);
 }

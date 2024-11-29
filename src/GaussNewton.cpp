@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include"GaussNewton.h"
+#include"utils/costFunctions.h"
 
 namespace FittingAlgorithms{
   namespace GaussNewton{
@@ -103,10 +104,16 @@ namespace FittingAlgorithms{
                             std::map<std::string, double>& fittingParameters,
                             std::map<std::string, double>& extraParameters){
       
-      std::vector<double> y_predV = model(xdata_in, fittingParameters, extraParameters);
+      std::vector<double> y_predV(xdata_in.size()); // Reserva espacio para el resultado
+
+      std::transform(xdata_in.begin(), xdata_in.end(), y_predV.begin(),
+                     [&](const T x_element) {
+                       return model(x_element, fittingParameters, extraParameters);
+                     });
+      
       vector residuals(y_predV.size());
       for(int i = 0; i<ydata_in.size(); i++){
-        residuals(i) = -sqrt(costFunction(ydata_in[i], y_predV[i]));
+        residuals(i) = sqrt(costFunction(ydata_in[i], y_predV[i]));
       }
       return residuals;
     }
@@ -139,7 +146,9 @@ namespace FittingAlgorithms{
                                                   perturbedParams, extraParameters);
       
         perturbedParams[param.first] = originalValue;
-        J.col(col) = (y_predPerturbed - y_predBase) / EPSILON;
+        for (int i = 0; i < y_predBase.size(); ++i) {
+          J(i, col) = (y_predPerturbed[i] - y_predBase[i]) / EPSILON;
+        }
         ++col;
       }
       return J;
@@ -221,7 +230,7 @@ namespace FittingAlgorithms{
                                                     gnParams.regularization,
                                                     fittingParamsMap,
                                                     extraParameters);
-        vector delta_params = pseudoJ * residual;
+        vector delta_params = - pseudoJ * residual;
         double currentError = (delta_params.array() / fittingParams.array()).matrix().norm()/n;
       
         fittingParams += delta_params;
@@ -245,6 +254,17 @@ namespace FittingAlgorithms{
       return FitResult{fittingParamsMap, errors};
     }
 
+    template <typename T>
+    FitResult fit(std::vector<T>& xdata_in,
+                  std::vector<double>& ydata_in,
+                  GNParameters gnParams,
+                  ModelFunction<T> model,
+                  std::map<std::string, double>& initialGuesses,
+                  std::map<std::string, double>& extraParameters){
+      return fit(xdata_in, ydata_in, gnParams, model,
+                 squaredError, initialGuesses, extraParameters);
+    }
+    
     FitResult fitScalar(std::vector<double>& xdata_in,
                         std::vector<double>& ydata_in,
                         GNParameters gnParams,
@@ -254,6 +274,16 @@ namespace FittingAlgorithms{
                         std::map<std::string, double>& extraParameters){
       return fit<double>(xdata_in, ydata_in, gnParams, model,
                          costFunction, initialGuesses, extraParameters);
+    }
+    
+    FitResult fitScalar(std::vector<double>& xdata_in,
+                        std::vector<double>& ydata_in,
+                        GNParameters gnParams,
+                        ModelFunction<double> model,
+                        std::map<std::string, double>& initialGuesses,
+                        std::map<std::string, double>& extraParameters){
+      return fit<double>(xdata_in, ydata_in, gnParams, model,
+                         squaredError, initialGuesses, extraParameters);
 }
 
     FitResult fitVector(std::vector<std::vector<double>>& xdata_in,
@@ -265,6 +295,16 @@ namespace FittingAlgorithms{
                         std::map<std::string, double>& extraParameters){
       return fit<std::vector<double>>(xdata_in, ydata_in, gnParams, model,
                                       costFunction, initialGuesses, extraParameters);
-    }   
+    }
+
+    FitResult fitVector(std::vector<std::vector<double>>& xdata_in,
+                        std::vector<double>& ydata_in,
+                        GNParameters gnParams,
+                        ModelFunction<std::vector<double>> model,
+                        std::map<std::string, double>& initialGuesses,
+                        std::map<std::string, double>& extraParameters){
+      return fit<std::vector<double>>(xdata_in, ydata_in, gnParams, model,
+                                      squaredError, initialGuesses, extraParameters);
+    }
   }
 }

@@ -20,7 +20,10 @@ extensions = [
         sources=[
             "wrappers/FittingAlgorithmsWrapper.cpp",  # Wrapper del módulo principal
             "wrappers/GaussNewtonWrapper.cpp",  # Código fuente de Gauss-Newton
+            "wrappers/utils/costFunctionsWrapper.cpp",  # Código fuente de Gauss-Newton
             "src/GaussNewton.cpp",  # Código fuente de Gauss-Newton
+            "src/utils/costFunctions.cpp",  # Código fuente de Gauss-Newton
+            
         ],
         include_dirs=include_dirs,
         language="c++",

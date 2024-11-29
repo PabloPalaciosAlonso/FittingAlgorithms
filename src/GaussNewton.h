@@ -15,9 +15,9 @@ namespace FittingAlgorithms {
     using CostFunction = std::function<double(const double, const double)>;
     
     template <typename T>
-    using ModelFunction = std::function<std::vector<double>(const std::vector<T>&,
-                                                            const std::map<std::string, double>&,
-                                                            const std::map<std::string, double>&)>;
+    using ModelFunction = std::function<double(const T,
+                                               const std::map<std::string, double>&,
+                                               const std::map<std::string, double>&)>;
   
     constexpr double EPSILON = sqrt(std::numeric_limits<double>::epsilon());
     
@@ -72,12 +72,27 @@ namespace FittingAlgorithms {
                   CostFunction costFunction,
                   std::map<std::string, double>& initialGuesses,
                   std::map<std::string, double>& extraParameters);
+
+    template <typename T>
+    FitResult fit(std::vector<T>& xdata_in,
+                  std::vector<double>& ydata_in,
+                  GNParameters gnParams,
+                  ModelFunction<T> model,
+                  std::map<std::string, double>& initialGuesses,
+                  std::map<std::string, double>& extraParameters);
     
     FitResult fitScalar(std::vector<double>& xdata_in,
                         std::vector<double>& ydata_in,
                         GNParameters gnParams,
                         ModelFunction<double> model,
                         CostFunction costFunction,
+                        std::map<std::string, double>& initialGuesses,
+                        std::map<std::string, double>& extraParameters);
+
+    FitResult fitScalar(std::vector<double>& xdata_in,
+                        std::vector<double>& ydata_in,
+                        GNParameters gnParams,
+                        ModelFunction<double> model,
                         std::map<std::string, double>& initialGuesses,
                         std::map<std::string, double>& extraParameters);
     
@@ -88,5 +103,13 @@ namespace FittingAlgorithms {
                         CostFunction costFunction,
                         std::map<std::string, double>& initialGuesses,
                         std::map<std::string, double>& extraParameters);
+    
+    FitResult fitVector(std::vector<std::vector<double>>& xdata_in,
+                        std::vector<double>& ydata_in,
+                        GNParameters gnParams,
+                        ModelFunction<std::vector<double>> model,
+                        std::map<std::string, double>& initialGuesses,
+                        std::map<std::string, double>& extraParameters);
+    
   } 
 } 
