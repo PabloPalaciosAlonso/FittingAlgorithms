@@ -9,11 +9,13 @@ namespace FittingAlgorithms{
     return (ytrue-ypred)*(ytrue-ypred);
   }
 
-  double relativeError(double ytrue, double ypred){
-    return fabs((ytrue-ypred))/ytrue;
+  double squaredRelativeError(double ytrue, double ypred){
+    double relativeError = 1.0 - ypred/ytrue;
+    return relativeError * relativeError;
   }
-
-  double squaredLogarimicError(double ytrue, double ypred){
-    return log(ytrue/ypred)*log(ytrue/ypred);
+  
+  double squaredLogarithmicError(double ytrue, double ypred){
+    double logarithmicError = log(ytrue/ypred); 
+    return logarithmicError * logarithmicError;
   }
 }

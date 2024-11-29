@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include <functional>
+#include "utils/costFunctions.h"
 
 namespace FittingAlgorithms {
   namespace GaussNewton {
@@ -22,10 +23,10 @@ namespace FittingAlgorithms {
     constexpr double EPSILON = sqrt(std::numeric_limits<double>::epsilon());
     
     struct GNParameters{
-      int maxIterations;
-      double tolerance;
-      double regularization = 1e-8;
-      int printSteps = 10;
+      int maxIterations     = 100;
+      double tolerance      = 1e-5;
+      double regularization = 1e-6;
+      int printSteps        = 10;
     };
     
     struct FitResult {
@@ -63,53 +64,31 @@ namespace FittingAlgorithms {
                                                         std::map<std::string, double> &paramsMap,
                                                         std::map<std::string, double> &extraParameters,
                                                         vector residual);
-    
-    template <typename T>
-    FitResult fit(std::vector<T>& xdata_in,
-                  std::vector<double>& ydata_in,
-                  GNParameters gnParams,
-                  ModelFunction<T> model,
-                  CostFunction costFunction,
-                  std::map<std::string, double>& initialGuesses,
-                  std::map<std::string, double>& extraParameters);
 
     template <typename T>
     FitResult fit(std::vector<T>& xdata_in,
                   std::vector<double>& ydata_in,
-                  GNParameters gnParams,
                   ModelFunction<T> model,
                   std::map<std::string, double>& initialGuesses,
-                  std::map<std::string, double>& extraParameters);
-    
-    FitResult fitScalar(std::vector<double>& xdata_in,
-                        std::vector<double>& ydata_in,
-                        GNParameters gnParams,
-                        ModelFunction<double> model,
-                        CostFunction costFunction,
-                        std::map<std::string, double>& initialGuesses,
-                        std::map<std::string, double>& extraParameters);
+                  GNParameters gnParams = GNParameters(),
+                  CostFunction costFunction = squaredError,
+                  std::map<std::string, double> extraParameters = std::map<std::string, double>{});
 
     FitResult fitScalar(std::vector<double>& xdata_in,
                         std::vector<double>& ydata_in,
-                        GNParameters gnParams,
                         ModelFunction<double> model,
                         std::map<std::string, double>& initialGuesses,
-                        std::map<std::string, double>& extraParameters);
-    
+                        GNParameters gnParams = GNParameters(),
+                        CostFunction costFunction = squaredError,
+                        std::map<std::string, double> extraParameters = std::map<std::string, double>{});
+
     FitResult fitVector(std::vector<std::vector<double>>& xdata_in,
                         std::vector<double>& ydata_in,
-                        GNParameters gnParams,
-                        ModelFunction<std::vector<double>> model,
-                        CostFunction costFunction,
-                        std::map<std::string, double>& initialGuesses,
-                        std::map<std::string, double>& extraParameters);
-    
-    FitResult fitVector(std::vector<std::vector<double>>& xdata_in,
-                        std::vector<double>& ydata_in,
-                        GNParameters gnParams,
                         ModelFunction<std::vector<double>> model,
                         std::map<std::string, double>& initialGuesses,
-                        std::map<std::string, double>& extraParameters);
+                        GNParameters gnParams = GNParameters(),
+                        CostFunction costFunction = squaredError,
+                        std::map<std::string, double> extraParameters = std::map<std::string, double>{});
     
   } 
 } 
