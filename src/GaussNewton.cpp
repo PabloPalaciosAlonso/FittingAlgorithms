@@ -9,8 +9,8 @@
 namespace FittingAlgorithms{
   namespace GaussNewton{
 
-    // Function to convert std::map<std::string, double> to Eigen::VectorXd
-    vector mapToEigen(const std::map<std::string, double>& initialGuesses) {
+    // Function to convert StringDoubleMap to Eigen::VectorXd
+    vector mapToEigen(const StringDoubleMap& initialGuesses) {
       
       std::size_t total_size = initialGuesses.size();
     
@@ -27,8 +27,8 @@ namespace FittingAlgorithms{
     }
 
   
-    // Function to update a std::map<std::string, double> with values from an Eigen::VectorXd
-    void updateMapFromEigen(std::map<std::string, double>& m, const vector& eigenVec) {
+    // Function to update a StringDoubleMap with values from an Eigen::VectorXd
+    void updateMapFromEigen(StringDoubleMap& m, const vector& eigenVec) {
       // Ensure that the size of the Eigen::VectorXd matches the size of the std::map
       if (m.size() != int(eigenVec.size())) {
         std::cerr << "Error: The size of the vector (" << eigenVec.size()
@@ -46,7 +46,7 @@ namespace FittingAlgorithms{
       }
     }
   
-    void printParameters(const std::map<std::string, double>& parameters, int iter) {
+    void printParameters(const StringDoubleMap& parameters, int iter) {
       std::cout<<"Iteration "<<iter<<std::endl;
       for (const auto& param : parameters) {
         std::cout << "  " << param.first << " = " << param.second << std::endl;
@@ -55,19 +55,19 @@ namespace FittingAlgorithms{
     }
 
     // template<typename T1, typename Model, typename Jacobian>
-    // std::map<std::string, double> fitParams(std::vector<T1> &xdata_in,
+    // StringDoubleMap fitParams(std::vector<T1> &xdata_in,
     //                                         std::vector<double> &ydata_in,
     //                                         GNParameters params,
     //                                         Model model,
     //                                         Jacobian jacobian,
-    //                                         std::map<std::string, double> &initialGuesses,
-    //                                         std::map<std::string, double> &extraParameters) {
+    //                                         StringDoubleMap &initialGuesses,
+    //                                         StringDoubleMap &extraParameters) {
     
     //   vector fittingParams  = mapToEigen(initialGuesses);
     //   int n = initialGuesses.size();
     //   matrix regularization = Eigen::MatrixXd::Identity(n, n) * params.regularization; 
     //   vector y_data         = Eigen::Map<const vector>(ydata_in.data(), ydata_in.size());
-    //   std::map<std::string, double> fittingParamsMap = initialGuesses;
+    //   StringDoubleMap fittingParamsMap = initialGuesses;
     
     //   for (int i = 0; i < params.maxIterations; ++i) {
     //     std::vector<double> y_predV = model(xdata_in, fittingParamsMap, extraParameters);
@@ -101,8 +101,8 @@ namespace FittingAlgorithms{
                             std::vector<double> &ydata_in,
                             ModelFunction<T> model,
                             CostFunction costFunction,
-                            std::map<std::string, double>& fittingParameters,
-                            std::map<std::string, double>& extraParameters){
+                            StringDoubleMap& fittingParameters,
+                            StringDoubleMap& extraParameters){
       
       std::vector<double> y_predV(xdata_in.size()); // Reserva espacio para el resultado
 
@@ -125,10 +125,10 @@ namespace FittingAlgorithms{
                                     std::vector<double> &ydata_in,
                                     ModelFunction<T> model,
                                     CostFunction costFunction,
-                                    std::map<std::string, double> &paramsMap,
-                                    std::map<std::string, double> &extraParameters) {
+                                    StringDoubleMap &paramsMap,
+                                    StringDoubleMap &extraParameters) {
       // Create a map to store perturbed parameters
-      std::map<std::string, double> perturbedParams = paramsMap;
+      StringDoubleMap perturbedParams = paramsMap;
       
       vector y_predBase = computeResiduals(xdata_in, ydata_in,
                                            model, costFunction,
@@ -158,8 +158,8 @@ namespace FittingAlgorithms{
                                  ModelFunction<T> model,
                                  CostFunction costFunction,
                                  double regularization,
-                                 std::map<std::string, double> &paramsMap,
-                                 std::map<std::string, double> &extraParameters) {
+                                 StringDoubleMap &paramsMap,
+                                 StringDoubleMap &extraParameters) {
     
     
       int nParams           = paramsMap.size();
@@ -174,16 +174,16 @@ namespace FittingAlgorithms{
     }
 
     template<typename T>
-    std::map<std::string, double> computeStandardErrors(std::vector<T> &xdata_in,
+    StringDoubleMap computeStandardErrors(std::vector<T> &xdata_in,
                                                         std::vector<double> &ydata_in,
                                                         ModelFunction<T> model,
                                                         CostFunction costFunction,
                                                         double regularization,
-                                                        std::map<std::string, double> &paramsMap,
-                                                        std::map<std::string, double> &extraParameters,
+                                                        StringDoubleMap &paramsMap,
+                                                        StringDoubleMap &extraParameters,
                                                         vector residual){
     
-      std::map<std::string, double> errors;
+      StringDoubleMap errors;
       int nParams        = paramsMap.size();
       double residualSum = residual.squaredNorm();
       double variance    = residualSum / (ydata_in.size() - nParams);
@@ -205,16 +205,16 @@ namespace FittingAlgorithms{
     FitResult fit(std::vector<T>& xdata_in,
                   std::vector<double>& ydata_in,
                   ModelFunction<T> model,
-                  std::map<std::string, double>& initialGuesses,
+                  StringDoubleMap& initialGuesses,
                   GNParameters gnParams,
                   CostFunction costFunction,
-                  std::map<std::string, double> extraParameters){
+                  StringDoubleMap extraParameters){
       
       vector fittingParams = mapToEigen(initialGuesses);
       int n                = initialGuesses.size();
     
       vector y_data        = Eigen::Map<const vector>(ydata_in.data(), ydata_in.size());
-      std::map<std::string, double> fittingParamsMap = initialGuesses;
+      StringDoubleMap fittingParamsMap = initialGuesses;
     
       vector residual;
       for (int i = 0; i < gnParams.maxIterations; ++i) {
@@ -251,30 +251,21 @@ namespace FittingAlgorithms{
     
       return FitResult{fittingParamsMap, errors};
     }
-        
-    FitResult fitScalar(std::vector<double>& xdata_in,
-                        std::vector<double>& ydata_in,
-                        ModelFunction<double> model,
-                        std::map<std::string, double>& initialGuesses,
-                        GNParameters gnParams,
-                        CostFunction costFunction,
-                        std::map<std::string, double> extraParameters){
-      
-      return fit<double>(xdata_in, ydata_in, model, initialGuesses,
-                         gnParams, costFunction,
-                         extraParameters);
-}
 
-    FitResult fitVector(std::vector<std::vector<double>>& xdata_in,
-                        std::vector<double>& ydata_in,
-                        ModelFunction<std::vector<double>> model,
-                        std::map<std::string, double>& initialGuesses,
-                        GNParameters gnParams,
-                        CostFunction costFunction,
-                        std::map<std::string, double> extraParameters){
-      
-      return fit<std::vector<double>>(xdata_in, ydata_in, model, initialGuesses,
-                                      gnParams, costFunction, extraParameters);
-    }    
+    template FitResult fit<double>(std::vector<double>& xdata_in,
+                                   std::vector<double>& ydata_in,
+                                   ModelFunction<double> model,
+                                   StringDoubleMap& initialGuesses,
+                                   GNParameters gnParams,
+                                   CostFunction costFunction,
+                                   StringDoubleMap extraParameters);
+    
+    template FitResult fit<std::vector<double>>(std::vector<std::vector<double>>& xdata_in,
+                                                std::vector<double>& ydata_in,
+                                                ModelFunction<std::vector<double>> model,
+                                                StringDoubleMap& initialGuesses,
+                                                GNParameters gnParams,
+                                                CostFunction costFunction,
+                                                StringDoubleMap extraParameters);
   }
 }

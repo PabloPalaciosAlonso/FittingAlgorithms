@@ -1,8 +1,7 @@
 #pragma once
 #include<random>
 
-namespace parallelTempering {
-  
+namespace FittingAlgorithms {
   std::mt19937& getRng() {
     static std::random_device rd;
     static std::mt19937 rng(rd());
