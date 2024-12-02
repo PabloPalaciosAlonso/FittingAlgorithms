@@ -11,16 +11,16 @@ namespace py = pybind11;
 namespace FittingAlgorithms {
   namespace ParallelTempering {
 
-    void registerPTParameters(py::module_& module) {
-      py::class_<PTParameters>(module, "PTParameters")
+    void registerParameters(py::module_& module) {
+      py::class_<Parameters>(module, "Parameters")
         .def(py::init<>())
-        .def_readwrite("maxIterations", &PTParameters::maxIterations)
-        .def_readwrite("numStepsSwap", &PTParameters::numStepsSwap)
-        .def_readwrite("printSteps", &PTParameters::printSteps)
-        .def_readwrite("numStepsFinish", &PTParameters::numStepsFinish)
-        .def_readwrite("tolerance", &PTParameters::tolerance)
-        .def_readwrite("temperatures", &PTParameters::temperatures)
-        .def_readwrite("jumpSize", &PTParameters::jumpSize);
+        .def_readwrite("maxIterations", &Parameters::maxIterations)
+        .def_readwrite("numStepsSwap", &Parameters::numStepsSwap)
+        .def_readwrite("printSteps", &Parameters::printSteps)
+        .def_readwrite("numStepsFinish", &Parameters::numStepsFinish)
+        .def_readwrite("tolerance", &Parameters::tolerance)
+        .def_readwrite("temperatures", &Parameters::temperatures)
+        .def_readwrite("jumpSize", &Parameters::jumpSize);
     }
 
     template <typename T>
@@ -29,7 +29,7 @@ namespace FittingAlgorithms {
                            std::vector<double>& ydata_in,
                            py::function model,
                            std::vector<StringDoubleMap>& initialGuesses,
-                           PTParameters& ptParams,
+                           Parameters& ptParams,
                            py::function costFunction,
                            StringDoubleMap extraParameters) {
         
@@ -51,7 +51,7 @@ namespace FittingAlgorithms {
                  py::arg("ydata_in"),
                  py::arg("model"),
                  py::arg("initialGuesses"),
-                 py::arg("ptParams") = PTParameters(),
+                 py::arg("ptParams") = Parameters(),
                  py::arg("costFunction") = py::cpp_function(squaredError),
                  py::arg("extraParameters") = StringDoubleMap{},
                  description.c_str());
@@ -60,7 +60,7 @@ namespace FittingAlgorithms {
                                  std::vector<double>& ydata_in,
                                  py::function model,
                                  StringDoubleMap& initialGuess,
-                                 PTParameters& ptParams,
+                                 Parameters& ptParams,
                                  py::function costFunction,
                                  StringDoubleMap extraParameters) {
         
@@ -72,7 +72,7 @@ namespace FittingAlgorithms {
                  py::arg("ydata_in"),
                  py::arg("model"),
                  py::arg("initialGuess"),
-                 py::arg("ptParams") = PTParameters(),
+                 py::arg("ptParams") = Parameters(),
                  py::arg("costFunction") = py::cpp_function(squaredError),
                  py::arg("extraParameters") = StringDoubleMap{},
                  (description + " (with a single initial guess)").c_str());
@@ -85,7 +85,7 @@ namespace FittingAlgorithms {
     }
 
     void registerParallelTempering(py::module_& module) {
-      registerPTParameters(module);
+      registerParameters(module);
       registerFittingFunctions(module);
     }
   }

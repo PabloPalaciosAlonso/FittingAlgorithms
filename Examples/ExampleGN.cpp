@@ -8,7 +8,8 @@
 #include "../src/utils/defines.h"
 
 // Modelo polinómico
-double model(double x, const std::map<std::string, double>& params, const std::map<std::string, double>& extraParams) {
+double model(double x, const std::map<std::string, double>& params,
+             const std::map<std::string, double>& extraParams) {
     double a = params.at("a");
     double b = params.at("b");
     double c = params.at("c");
@@ -28,7 +29,7 @@ int main(int argc, char* argv[]) {
   }
   
   // Configurar parámetros de Gauss-Newton
-  FittingAlgorithms::GaussNewton::GNParameters gnParams;
+  FittingAlgorithms::GaussNewton::Parameters gnParams;
   gnParams.maxIterations = 10000;
   gnParams.tolerance = 1e-8;
   gnParams.printSteps = 50;

@@ -15,7 +15,7 @@ xdata          = np.linspace(0,10)
 ydata          = model(xdata, trueParameters, {})
 
 # Configure the Parallel-Tempering parameters
-pt_params                = fa.ParallelTempering.PTParameters()
+pt_params                = fa.ParallelTempering.Parameters()
 pt_params.maxIterations  = 10000
 pt_params.temperatures   = [1e-6, 1e-4, 1e-2, 1e0, 1e2]
 pt_params.jumpSize       = 5*[0.001, 0.001, 0.001, 0.001, 0.001]

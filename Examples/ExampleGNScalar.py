@@ -15,7 +15,7 @@ xdata          = np.linspace(0,10)
 ydata          = model(xdata, trueParameters, {})
 
 # Optional configure the Gauss-Newton parameters
-gn_params                = fa.GaussNewton.GNParameters()
+gn_params                = fa.GaussNewton.Parameters()
 gn_params.maxIterations  = 10000
 gn_params.tolerance      = 1e-8
 gn_params.printSteps     = 100

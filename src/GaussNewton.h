@@ -15,7 +15,7 @@ namespace FittingAlgorithms{
     
     constexpr double EPSILON = sqrt(std::numeric_limits<double>::epsilon());
     
-    struct GNParameters{
+    struct Parameters{
       int maxIterations     = 100;
       int printSteps        = 10;
       double tolerance      = 1e-5;
@@ -182,10 +182,10 @@ namespace FittingAlgorithms{
     FitResult fit(std::vector<T>& xdata_in,
                   std::vector<double>& ydata_in,
                   ModelFunction<T> model,
-                         StringDoubleMap& initialGuesses,
-                         GNParameters gnParams = GNParameters(),
-                         CostFunction costFunction = squaredError,
-                         StringDoubleMap extraParameters = {}){
+                  StringDoubleMap& initialGuesses,
+                  Parameters gnParams = Parameters(),
+                  CostFunction costFunction = squaredError,
+                  StringDoubleMap extraParameters = {}){
       
       vector fittingParams = mapToEigen(initialGuesses);
       int n                = initialGuesses.size();

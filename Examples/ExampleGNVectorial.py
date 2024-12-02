@@ -22,7 +22,7 @@ ydata = [trueParameters["a"] * np.dot(x, x) +
 initial_guesses = {"a": 1.0, "b": 1.0}
 
 # Configure the Gauss-Newton parameters (optional)
-gn_params = fa.GaussNewton.GNParameters()
+gn_params = fa.GaussNewton.Parameters()
 gn_params.maxIterations = 1000
 gn_params.tolerance = 1e-6
 gn_params.printSteps = 10

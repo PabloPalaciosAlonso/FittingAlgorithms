@@ -12,7 +12,7 @@
 namespace FittingAlgorithms{
   namespace ParallelTempering {
     
-    struct PTParameters{
+    struct Parameters{
       std::vector<double> temperatures;
       std::vector<double> jumpSize;
       int numStepsSwap;
@@ -173,7 +173,7 @@ namespace FittingAlgorithms{
                                       const std::vector<StringDoubleMap>& optimalFittingParameters,
                                       double& minError, StringDoubleMap& bestParameters,
                                       int& stepsSameError, bool& minErrorChanged,
-                                      const PTParameters& params) {
+                                      const Parameters& params) {
       minErrorChanged = false; // Reset the flag
       for (size_t i = 0; i < optimalErrors.size(); ++i) {
         if (optimalErrors[i] < minError) {
@@ -243,7 +243,7 @@ namespace FittingAlgorithms{
                                std::vector<double> &ydata,
                                ModelFunction<T> model,
                                std::vector<StringDoubleMap> &initialGuesses,
-                               PTParameters params = PTParameters(),
+                               Parameters params = Parameters(),
                                CostFunction costFunction = squaredError,
                                StringDoubleMap extraParameters = StringDoubleMap{}){
       //Initialize all the parameters
@@ -308,7 +308,7 @@ namespace FittingAlgorithms{
                                std::vector<double> &ydata,
                                ModelFunction<T> model,
                                StringDoubleMap &initialGuess,
-                               PTParameters params = PTParameters(),
+                               Parameters params = Parameters(),
                                CostFunction costFunction = squaredError,
                                StringDoubleMap extraParameters = StringDoubleMap{}){
       

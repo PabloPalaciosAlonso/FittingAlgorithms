@@ -11,13 +11,13 @@ namespace py = pybind11;
 namespace FittingAlgorithms {
   namespace GaussNewton {
 
-    void registerGNParameters(py::module_& module) {
-      py::class_<GNParameters>(module, "GNParameters")
+    void registerParameters(py::module_& module) {
+      py::class_<Parameters>(module, "Parameters")
         .def(py::init<>())
-        .def_readwrite("maxIterations", &GNParameters::maxIterations)
-        .def_readwrite("tolerance", &GNParameters::tolerance)
-        .def_readwrite("regularization", &GNParameters::regularization)
-        .def_readwrite("printSteps", &GNParameters::printSteps);
+        .def_readwrite("maxIterations", &Parameters::maxIterations)
+        .def_readwrite("tolerance", &Parameters::tolerance)
+        .def_readwrite("regularization", &Parameters::regularization)
+        .def_readwrite("printSteps", &Parameters::printSteps);
     }
 
     template <typename T>
@@ -42,7 +42,7 @@ namespace FittingAlgorithms {
                            std::vector<double>& ydata_in,
                            py::function model,
                            std::map<std::string, double>& initialGuesses,
-                           GNParameters& gnParams,
+                           Parameters& gnParams,
                            py::function costFunction,
                            std::map<std::string, double>& extraParameters) {
         // Crear funciones adaptadas
@@ -59,7 +59,7 @@ namespace FittingAlgorithms {
       py::arg("ydata_in"),
       py::arg("model"),
       py::arg("initialGuesses"),
-      py::arg("gnParams") = GNParameters(),
+      py::arg("gnParams") = Parameters(),
       py::arg("costFunction") = py::cpp_function(squaredError),
       py::arg("extraParameters") = std::map<std::string, double>{},
       description.c_str());
@@ -71,7 +71,7 @@ namespace FittingAlgorithms {
     }
 
     void registerGaussNewton(py::module_& module) {
-      registerGNParameters(module);
+      registerParameters(module);
       registerFittingFunctions(module);
     }
   }

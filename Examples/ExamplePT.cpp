@@ -10,7 +10,6 @@
 
 using namespace FittingAlgorithms;
 
-// Modelo polinómico
 double model(double x, const std::map<std::string, double>& params, const std::map<std::string, double>& extraParams) {
     double a = params.at("a");
     double b = params.at("b");
@@ -30,7 +29,7 @@ int main(int argc, char* argv[]) {
     ydata[i] = model(xdata[i], trueParameters, {});
   }
  
-  ParallelTempering::PTParameters ptParams;
+  ParallelTempering::Parameters ptParams;
   ptParams.maxIterations  = 10000;
   ptParams.temperatures   = {1e-6, 1e-4, 1e-2, 1e0, 1e2};
   ptParams.jumpSize       = {0.001, 0.001, 0.001, 0.001, 0.001};
