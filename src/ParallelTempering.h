@@ -15,10 +15,12 @@ namespace FittingAlgorithms{
     struct PTParameters{
       std::vector<double> temperatures;
       std::vector<double> jumpSize;
-      int numberStepsSwap;
-      int maximumNumberSteps;
-      int numberStepsFinish;
-      double errorBreak = 0;
+      int numStepsSwap;
+      int numStepsFinish;
+      int maxIterations;
+      double tolerance = 0;
+      int printSteps;
+      int numThreads = omp_get_max_threads();
     };
   
     template<typename T2>
@@ -44,22 +46,22 @@ namespace FittingAlgorithms{
                                std::vector<double> &errors);
   
   
-    template<typename T, typename Model, typename Cost>
+    template<typename T>
     StringDoubleMap fit(std::vector<T> &xdata_in,
                         std::vector<double> &ydata_in,
-                        Model model,
+                        ModelFunction<T> model,
                         std::vector<StringDoubleMap> &initialGuesses,
                         PTParameters ptParams = PTParameters(),
-                        Cost costFunction = squaredError,
-                        StringDoubleMap &extraParameters = StringDoubleMap{});
+                        CostFunction costFunction = squaredError,
+                        StringDoubleMap extraParameters = StringDoubleMap{});
     
-    template<typename T, typename Model, typename Cost>
+    template<typename T>
     StringDoubleMap fit(std::vector<T> &xdata,
                         std::vector<double> &ydata,
-                        Model model,
+                        ModelFunction<T> model,
                         StringDoubleMap &initialGuesses,
                         PTParameters ptParams = PTParameters(),
-                        Cost costFunction = squaredError,
+                        CostFunction costFunction = squaredError,
                         StringDoubleMap &extraParameters = StringDoubleMap{});
 
   }

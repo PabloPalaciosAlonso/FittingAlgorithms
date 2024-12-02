@@ -20,14 +20,17 @@ extensions = [
         sources=[
             "wrappers/FittingAlgorithmsWrapper.cpp",  # Wrapper del módulo principal
             "wrappers/GaussNewtonWrapper.cpp",  # Código fuente de Gauss-Newton
+            "wrappers/ParallelTemperingWrapper.cpp",  # Código fuente de Gauss-Newton
             "wrappers/utils/costFunctionsWrapper.cpp",  # Código fuente de Gauss-Newton
             "src/GaussNewton.cpp",  # Código fuente de Gauss-Newton
+            "src/ParallelTempering.cpp",  # Código fuente de Gauss-Newton
             "src/utils/costFunctions.cpp",  # Código fuente de Gauss-Newton
             
         ],
         include_dirs=include_dirs,
         language="c++",
-        extra_compile_args=["-std=c++17"],  # Configuración del compilador
+        extra_compile_args=["-std=c++17", "-fopenmp"],
+        extra_link_args=["-fopenmp"],  # Enlazador
     )
 ]
 
