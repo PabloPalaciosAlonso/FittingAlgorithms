@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
   FittingAlgorithms::GaussNewton::GNParameters gnParams;
   gnParams.maxIterations = 10000;
   gnParams.tolerance = 1e-8;
-  gnParams.printSteps = 1;
+  gnParams.printSteps = 50;
   gnParams.regularization = 1e-5;
 
   // Suposiciones iniciales
