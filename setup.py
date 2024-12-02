@@ -23,7 +23,7 @@ extensions = [
         ],
         include_dirs=include_dirs,
         language="c++",
-        extra_compile_args=["-std=c++17", "-fopenmp"],
+        extra_compile_args=["-std=c++17", "-fopenmp", "-O3"],
         extra_link_args=["-fopenmp"],
     )
 ]

@@ -36,9 +36,9 @@ pt_params.printSteps     = 5000
 
 
 # Run the fitting algorithm for vector data
-parameters  = fa.ParallelTempering.fit(xdata, ydata, vector_model,
-                                       initial_guesses,
-                                       ptParams = pt_params)
+parameters, error  = fa.ParallelTempering.fit(xdata, ydata, vector_model,
+                                              initial_guesses,
+                                              ptParams = pt_params)
 # Display the results
 print("Fitted Parameters:", parameters)
 print("Target Parameters:", trueParameters)
