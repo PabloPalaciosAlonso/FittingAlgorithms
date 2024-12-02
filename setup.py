@@ -2,56 +2,42 @@ from setuptools import setup, Extension
 import pybind11
 import os
 
-# Ruta al directorio base del proyecto
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
-# Incluir directorios de encabezados
 include_dirs = [
-    pybind11.get_include(),  # Incluir PyBind11
-    os.path.join(base_dir, "src"),  # Incluir tu código fuente
-    os.path.join(base_dir, "wrappers"),   # Encabezados adicionales (si los hay)
+    pybind11.get_include(),
+    os.path.join(base_dir, "src"),
+    os.path.join(base_dir, "wrappers"),
     
 ]
 
-# Configurar la extensión
 extensions = [
     Extension(
-        name="FittingAlgorithms",  # Nombre del módulo principal
+        name="FittingAlgorithms",
         sources=[
-            "wrappers/FittingAlgorithmsWrapper.cpp",  # Wrapper del módulo principal
-            "wrappers/GaussNewtonWrapper.cpp",  # Código fuente de Gauss-Newton
-            "wrappers/ParallelTemperingWrapper.cpp",  # Código fuente de Gauss-Newton
-            "wrappers/utils/costFunctionsWrapper.cpp",  # Código fuente de Gauss-Newton
-            "src/GaussNewton.cpp",  # Código fuente de Gauss-Newton
-            "src/ParallelTempering.cpp",  # Código fuente de Gauss-Newton
-            "src/utils/costFunctions.cpp",  # Código fuente de Gauss-Newton
+            "wrappers/FittingAlgorithmsWrapper.cpp",
+            "wrappers/GaussNewtonWrapper.cpp",
+            "wrappers/ParallelTemperingWrapper.cpp",
+            "wrappers/utils/costFunctionsWrapper.cpp",
             
         ],
         include_dirs=include_dirs,
         language="c++",
         extra_compile_args=["-std=c++17", "-fopenmp"],
-        extra_link_args=["-fopenmp"],  # Enlazador
+        extra_link_args=["-fopenmp"],
     )
 ]
 
-# Configurar la instalación
 setup(
     name="FittingAlgorithms",
     version="1.0.0",
-    author="Tu Nombre",
-    author_email="tu.email@example.com",
-    description="Módulo Python para algoritmos de ajuste, incluyendo Gauss-Newton.",
-    long_description="Bindings de Python para varios algoritmos de ajuste implementados en C++.",
+    author="Pablo Palacios-Alonso",
+    author_email="pablo.palaciosa@uam.es",
+    description="Python module with some fitting algorithms.",
     ext_modules=extensions,
     zip_safe=False,
     python_requires=">=3.6",
     install_requires=[
-        "pybind11>=2.6.0",  # Dependencia de PyBind11
-    ],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Programming Language :: C++",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "pybind11>=2.6.0",
     ],
 )
