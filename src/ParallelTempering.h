@@ -284,7 +284,7 @@ namespace FittingAlgorithms{
         }
         
         // Perform swaps
-        if (step % params.numStepsSwap == 0) {
+        if (step % params.numStepsSwap == 0 and step > 0) {
           
           tryToSwapTemperatures(params.temperatures, allFittingParameters,
                                 optimalFittingParameters, optimalErrors);
