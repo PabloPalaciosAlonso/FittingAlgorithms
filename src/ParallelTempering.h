@@ -274,7 +274,7 @@ namespace FittingAlgorithms{
                                   allFittingParameters, optimalFittingParameters);
         }
         
-        if (step % params.printSteps == 0){
+        if (step % params.printSteps == 0 and step > 0){
           auto now = std::chrono::high_resolution_clock::now();
           std::chrono::duration<double> elapsed = now - start;
           printStepProgress(step, params.maxIterations, start,
