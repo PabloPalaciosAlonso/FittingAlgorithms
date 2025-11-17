@@ -34,7 +34,7 @@ namespace FittingAlgorithms{
       }
     }
     
-    std::string getRandomParameter(const StringDoubleMap& parameters) {
+    inline std::string getRandomParameter(const StringDoubleMap& parameters) {
       int nParameters = parameters.size();
       if (nParameters == 0) {
         throw std::runtime_error("The parameters map is empty");
@@ -48,8 +48,8 @@ namespace FittingAlgorithms{
       return it->first;
     }
 
-    StringDoubleMap proposeNewFittingParameters(const StringDoubleMap currentFittingParameters,
-                                                const double jumpSize){
+    inline StringDoubleMap proposeNewFittingParameters(const StringDoubleMap currentFittingParameters,
+                          const double jumpSize){
 
       
       std::string param                    = getRandomParameter(currentFittingParameters);
@@ -62,12 +62,12 @@ namespace FittingAlgorithms{
       return newFittingParameters;
     }
 
-    void updateFittingParameters(StringDoubleMap &fittingParameters,
-                                 StringDoubleMap newFittingParameters,
-                                 double oldError,
-                                 double &newError,
-                                 double temperature,
-                                 double &jumpSize){
+    inline void updateFittingParameters(StringDoubleMap &fittingParameters,
+                   StringDoubleMap newFittingParameters,
+                   double oldError,
+                   double &newError,
+                   double temperature,
+                   double &jumpSize){
       
       if (newError < oldError){
         fittingParameters = newFittingParameters;
@@ -83,10 +83,10 @@ namespace FittingAlgorithms{
       }
     }
     
-    void tryToSwapTemperatures(std::vector<double>& temperatures,
-                               std::vector<std::map<std::string, double>>& allFittingParameters,
-                               std::vector<std::map<std::string, double>>& optimalFittingParameters,
-                               std::vector<double>& errors) {
+    inline void tryToSwapTemperatures(std::vector<double>& temperatures,
+                   std::vector<std::map<std::string, double>>& allFittingParameters,
+                   std::vector<std::map<std::string, double>>& optimalFittingParameters,
+                   std::vector<double>& errors) {
       int numTemperatures = temperatures.size();
       bool shouldTryToSwap = true;
       
@@ -131,10 +131,10 @@ namespace FittingAlgorithms{
     }
 
     // Helper function to update optimal parameters for a given temperature
-    void updateOptimalParameters(int tempIdx, double currentError,
-                                 std::vector<double>& optimalErrors,
-                                 const std::vector<StringDoubleMap>& allFittingParameters,
-                                 std::vector<StringDoubleMap>& optimalFittingParameters) {
+    inline void updateOptimalParameters(int tempIdx, double currentError,
+                   std::vector<double>& optimalErrors,
+                   const std::vector<StringDoubleMap>& allFittingParameters,
+                   std::vector<StringDoubleMap>& optimalFittingParameters) {
       if (currentError < optimalErrors[tempIdx]) {
         optimalErrors[tempIdx] = currentError;
         optimalFittingParameters[tempIdx] = allFittingParameters.at(tempIdx);
@@ -142,11 +142,11 @@ namespace FittingAlgorithms{
     }
     
     // Helper function to print step progress
-    void printStepProgress(int step, int maxSteps,
-                           const std::chrono::high_resolution_clock::time_point& start,
-                           double elapsedTime,
-                           const std::vector<double>& optimalErrors,
-                           const std::vector<StringDoubleMap>& optimalFittingParameters) {
+    inline void printStepProgress(int step, int maxSteps,
+                 const std::chrono::high_resolution_clock::time_point& start,
+                 double elapsedTime,
+                 const std::vector<double>& optimalErrors,
+                 const std::vector<StringDoubleMap>& optimalFittingParameters) {
       std::cout << "Step " << step << "/" << maxSteps << std::endl;
       std::cout << "Elapsed time: " << elapsedTime << " seconds" << std::endl;
       
@@ -170,11 +170,11 @@ namespace FittingAlgorithms{
     }
 
     // Helper function to check and update the best parameters
-    void checkAndUpdateBestParameters(const std::vector<double>& optimalErrors,
-                                      const std::vector<StringDoubleMap>& optimalFittingParameters,
-                                      double& minError, StringDoubleMap& bestParameters,
-                                      int& stepsSameError, bool& minErrorChanged,
-                                      const Parameters& params) {
+    inline void checkAndUpdateBestParameters(const std::vector<double>& optimalErrors,
+                      const std::vector<StringDoubleMap>& optimalFittingParameters,
+                      double& minError, StringDoubleMap& bestParameters,
+                      int& stepsSameError, bool& minErrorChanged,
+                      const Parameters& params) {
       minErrorChanged = false; // Reset the flag
       for (size_t i = 0; i < optimalErrors.size(); ++i) {
         if (optimalErrors[i] < minError) {

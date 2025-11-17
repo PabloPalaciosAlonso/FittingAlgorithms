@@ -13,7 +13,7 @@ namespace FittingAlgorithms{
     using vector = Eigen::VectorXd;
     using matrix = Eigen::MatrixXd;
     
-    constexpr double EPSILON = sqrt(std::numeric_limits<double>::epsilon());
+    static double EPSILON = sqrt(std::numeric_limits<double>::epsilon());
     
     struct Parameters{
       int maxIterations     = 100;
@@ -30,7 +30,7 @@ namespace FittingAlgorithms{
 
 
     // Function to convert StringDoubleMap to Eigen::VectorXd
-    vector mapToEigen(const StringDoubleMap& initialGuesses) {
+    inline vector mapToEigen(const StringDoubleMap& initialGuesses) {
       
       std::size_t total_size = initialGuesses.size();
       
@@ -48,7 +48,7 @@ namespace FittingAlgorithms{
 
   
     // Function to update a StringDoubleMap with values from an Eigen::VectorXd
-    void updateMapFromEigen(StringDoubleMap& m, const vector& eigenVec) {
+    inline void updateMapFromEigen(StringDoubleMap& m, const vector& eigenVec) {
       // Ensure that the size of the Eigen::VectorXd matches the size of the std::map
       if (m.size() != int(eigenVec.size())) {
         std::cerr << "Error: The size of the vector (" << eigenVec.size()
