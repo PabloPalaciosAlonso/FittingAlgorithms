@@ -1,0 +1,11 @@
+name: fittingAlgorithms
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - c-compiler
+  - cxx-compiler
+  - cmake
+  - make
+  - eigen
