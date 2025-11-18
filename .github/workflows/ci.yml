@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Show dependency file
+      run: cat environment.yml
+      
+    - name: Install Mamba
+      uses: mamba-org/setup-micromamba@v2
+      with:
+        environment-file: environment.yml
+        cache-environment: true
+        cache-downloads: true
+        generate-run-shell: true
+
+    - name: List environment
+      run: |
+        micromamba list
+      shell: micromamba-shell {0}
+
+    - name: Configure and compile the library
+      run: |
+        cmake -B build
+        cmake --build build --parallel
+      shell: micromamba-shell {0}
+
+    - name: Run tests
+      run: |
+        ctest --output-on-failure --test-dir build
+      shell: micromamba-shell {0}
