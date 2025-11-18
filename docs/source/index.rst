@@ -15,25 +15,15 @@ Tests
 ------------
 .. code-block:: bash
 
-	ctest --output-on-failure --test-dir build
+    ctest --output-on-failure --test-dir build
 
 
 API Reference
 ==================
 
-GaussNewton.h 
--------------------
-
-.. doxygenfile:: GaussNewton.h
+.. doxygennamespace:: FittingAlgorithms
    :project: FittingAlgorithms
 
-costFunctions.h 
--------------------
-
-.. doxygenfile:: costFunctions.h
-   :project: FittingAlgorithms
-
-   
 
 Indices and tables
 ==================
