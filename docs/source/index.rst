@@ -27,6 +27,12 @@ GaussNewton.h
 .. doxygenfile:: GaussNewton.h
    :project: FittingAlgorithms
 
+costFunctions.h 
+-------------------
+
+.. doxygenfile:: costFunctions.h
+   :project: FittingAlgorithms
+
    
 
 Indices and tables
