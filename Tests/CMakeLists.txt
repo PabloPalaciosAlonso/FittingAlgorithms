@@ -9,14 +9,16 @@ FetchContent_MakeAvailable(googletest)
 include(GoogleTest)
 
 set(TEST_SOURCES
-    test_GaussNewton.cpp
+  test_GaussNewton.cpp
+  test_ParallelTempering.cpp
 )
 
 foreach(source_file IN LISTS TEST_SOURCES)
     add_executable(${source_file} ${source_file})
     target_link_libraries(${source_file} 
-                        PRIVATE 
-                        GaussNewton
-                        GTest::gtest_main)
+      PRIVATE 
+      GaussNewton
+      ParallelTempering
+      GTest::gtest_main)
     gtest_discover_tests(${source_file}) 
 endforeach()
