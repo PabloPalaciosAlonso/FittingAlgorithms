@@ -1,28 +1,23 @@
-#pragma once
-#include <iostream>
-#include <map>
-#include <string>
-#include <chrono>
-#include <vector>
-#include <cfloat>
-#include <omp.h>
-#include "utils/defines.h"
-#include "utils/randomNumbers.h"
-#include "utils/costFunctions.h"
+#include"ParallelTempering.h"
 
 namespace FittingAlgorithms{
   namespace ParallelTempering {
+
+    inline std::mt19937& getRng() {
+      static std::random_device rd;
+      static std::mt19937 rng(rd());
+      return rng;
+    }
     
-    struct Parameters{
-      std::vector<double> temperatures;
-      std::vector<double> jumpSize;
-      int numStepsSwap;
-      int numStepsFinish;
-      int maxIterations;
-      double tolerance = 0;
-      int printSteps;
-      int numThreads = omp_get_max_threads();
-    };
+    inline int generateRandomInt(int first, int last) {
+      std::uniform_int_distribution<int> dist(first, last);
+      return dist(getRng());
+    }
+  
+    inline double generateRandomDouble(double first, double last) {
+      std::uniform_real_distribution<double> dist(first, last);
+      return dist(getRng());
+    }
     
     inline void printParameters(const std::vector<StringDoubleMap>& optimalFittingParameters) {
       std::cout<<optimalFittingParameters[0].size()<<std::endl;
@@ -171,10 +166,10 @@ namespace FittingAlgorithms{
 
     // Helper function to check and update the best parameters
     inline void checkAndUpdateBestParameters(const std::vector<double>& optimalErrors,
-                      const std::vector<StringDoubleMap>& optimalFittingParameters,
-                      double& minError, StringDoubleMap& bestParameters,
-                      int& stepsSameError, bool& minErrorChanged,
-                      const Parameters& params) {
+                                             const std::vector<StringDoubleMap>& optimalFittingParameters,
+                                             double& minError, StringDoubleMap& bestParameters,
+                                             int& stepsSameError, bool& minErrorChanged,
+                                             const Parameters& params) {
       minErrorChanged = false; // Reset the flag
       for (size_t i = 0; i < optimalErrors.size(); ++i) {
         if (optimalErrors[i] < minError) {
@@ -190,15 +185,14 @@ namespace FittingAlgorithms{
       }
     }
     
-    template <typename T>
-    double computeAverageError(const std::vector<T>& xdata_in,
+    double computeAverageError(const std::vector<double>& xdata_in,
                                const std::vector<double>& ydata_in,
-                               const ModelFunction<T>& model,
+                               const ModelFunction& model,
                                const StringDoubleMap& fittingParameters,
                                const CostFunction& costFunction,                               
                                const StringDoubleMap& extraParameters) {
       
-      auto calculateError = [&](const T& x_element, const double& y_actual) {
+      auto calculateError = [&](const double& x_element, const double& y_actual) {
         double y_pred = model(x_element, fittingParameters, extraParameters);
         return costFunction(y_actual, y_pred);
       };
@@ -213,10 +207,9 @@ namespace FittingAlgorithms{
       return totalError / xdata_in.size();
     }
     
-    template<typename T>
-    double forwardTimeMC(std::vector<T> &xdata,
+    double forwardTimeMC(std::vector<double> &xdata,
                          std::vector<double> &ydata,
-                         ModelFunction<T> model,
+                         ModelFunction model,
                          StringDoubleMap &fittingParameters,
                          double temperature,
                          double &jumpSize,
@@ -226,7 +219,7 @@ namespace FittingAlgorithms{
       double oldError           = computeAverageError(xdata, ydata, model,
                                                       fittingParameters,
                                                       costFunc, extraParameters);
-
+      
       StringDoubleMap newFittingParameters = proposeNewFittingParameters(fittingParameters, jumpSize);
       
       double newError             = computeAverageError(xdata, ydata, model,
@@ -239,14 +232,13 @@ namespace FittingAlgorithms{
       return newError;
     }
     
-    template<typename T>
-    StringDoubleMap fit(std::vector<T> &xdata,
-                               std::vector<double> &ydata,
-                               ModelFunction<T> model,
-                               std::vector<StringDoubleMap> &initialGuesses,
-                               Parameters params = Parameters(),
-                               CostFunction costFunction = squaredError,
-                               StringDoubleMap extraParameters = StringDoubleMap{}){
+    StringDoubleMap fit(std::vector<double> &xdata_in,
+                        std::vector<double> &ydata_in,
+                        ModelFunction model,
+                        std::vector<StringDoubleMap> &initialGuesses,
+                        Parameters params,
+                        CostFunction costFunction,
+                        StringDoubleMap extraParameters){
       //Initialize all the parameters
       int nTemperatures = params.temperatures.size();
       double minError   = DBL_MAX;
@@ -265,7 +257,7 @@ namespace FittingAlgorithms{
         
 #pragma omp parallel for num_threads(params.numThreads)
         for (int tempIdx = 0; tempIdx < nTemperatures; ++tempIdx) {
-          errors[tempIdx] = forwardTimeMC(xdata, ydata, model, allFittingParameters[tempIdx],
+          errors[tempIdx] = forwardTimeMC(xdata_in, ydata_in, model, allFittingParameters[tempIdx],
                                           params.temperatures[tempIdx], params.jumpSize[tempIdx],
                                           costFunction, extraParameters);
           
@@ -304,19 +296,18 @@ namespace FittingAlgorithms{
       return bestParameters;
     }
     
-    template<typename T>
-    StringDoubleMap fit(std::vector<T> &xdata,
-                               std::vector<double> &ydata,
-                               ModelFunction<T> model,
-                               StringDoubleMap &initialGuess,
-                               Parameters params = Parameters(),
-                               CostFunction costFunction = squaredError,
-                               StringDoubleMap extraParameters = StringDoubleMap{}){
+    StringDoubleMap fit(std::vector<double> &xdata_in,
+                        std::vector<double> &ydata_in,
+                        ModelFunction model,
+                        StringDoubleMap &initialGuess,
+                        Parameters params,
+                        CostFunction costFunction,
+                        StringDoubleMap extraParameters){
       
       std::vector<StringDoubleMap> initialGuesses(params.temperatures.size());
       std::fill(initialGuesses.begin(), initialGuesses.end(), initialGuess);
-      return fit<T>(xdata, ydata, model, initialGuesses, params,
-                    costFunction, extraParameters);
+      return fit(xdata_in, ydata_in, model, initialGuesses, params,
+                 costFunction, extraParameters);
     }
   }
 }

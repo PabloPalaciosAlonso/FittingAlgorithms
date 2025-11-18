@@ -1,11 +1,4 @@
-#pragma once
-#include <iostream>
-#include <Eigen/Dense>
-#include <vector>
-#include <map>
-#include <string>
-#include "utils/costFunctions.h"
-#include "utils/defines.h"
+#include "GaussNewton.h"
 
 namespace FittingAlgorithms{
   namespace GaussNewton{
@@ -15,19 +8,6 @@ namespace FittingAlgorithms{
     
     static double EPSILON = sqrt(std::numeric_limits<double>::epsilon());
     
-    struct Parameters{
-      int maxIterations     = 100;
-      int printSteps        = 10;
-      double tolerance      = 1e-5;
-      double regularization = 1e-6;
-      
-    };
-    
-    struct FitResult {
-      StringDoubleMap parameters;
-      StringDoubleMap errors;
-    };
-
 
     // Function to convert StringDoubleMap to Eigen::VectorXd
     inline vector mapToEigen(const StringDoubleMap& initialGuesses) {
@@ -74,33 +54,34 @@ namespace FittingAlgorithms{
       std::cout<<"\n";
     }
     
-    template <typename T>
-    vector computeResiduals(std::vector<T> &xdata_in,
+    vector computeResiduals(std::vector<double> &xdata_in,
                             std::vector<double> &ydata_in,
-                            ModelFunction<T> model,
+                            ModelFunction model,
                             CostFunction costFunction,
                             StringDoubleMap& fittingParameters,
                             StringDoubleMap& extraParameters){
       
-      std::vector<double> y_predV(xdata_in.size()); // Reserva espacio para el resultado
+      std::vector<double> y_predV(xdata_in.size());
 
       std::transform(xdata_in.begin(), xdata_in.end(), y_predV.begin(),
-                     [&](const T x_element) {
+                     [&](const double x_element) {
                        return model(x_element, fittingParameters, extraParameters);
                      });
       
       vector residuals(y_predV.size());
       for(int i = 0; i<ydata_in.size(); i++){
-        residuals(i) = sqrt(costFunction(ydata_in[i], y_predV[i]));
+        residuals(i) =  sqrt(costFunction(ydata_in[i], y_predV[i]));
+        if ((ydata_in[i]-y_predV[i])<0){
+          residuals(i)*=-1;
+        }
       }
       return residuals;
     }
     
     // Function to compute the Jacobian matrix numerically using finite differences
-    template <typename T>
-    Eigen::MatrixXd computeJacobian(std::vector<T> &xdata_in,
+    Eigen::MatrixXd computeJacobian(std::vector<double> &xdata_in,
                                     std::vector<double> &ydata_in,
-                                    ModelFunction<T> model,
+                                    ModelFunction model,
                                     CostFunction costFunction,
                                     StringDoubleMap &paramsMap,
                                     StringDoubleMap &extraParameters) {
@@ -129,10 +110,9 @@ namespace FittingAlgorithms{
       return J;
     }
   
-    template<typename T>
-    matrix computePseudoJacobian(std::vector<T> &xdata_in,
+    matrix computePseudoJacobian(std::vector<double> &xdata_in,
                                  std::vector<double> &ydata_in,
-                                 ModelFunction<T> model,
+                                 ModelFunction model,
                                  CostFunction costFunction,
                                  double regularization,
                                  StringDoubleMap &paramsMap,
@@ -150,10 +130,9 @@ namespace FittingAlgorithms{
       return pseudoJ;
     }
 
-    template<typename T>
-    StringDoubleMap computeStandardErrors(std::vector<T> &xdata_in,
+    StringDoubleMap computeStandardErrors(std::vector<double> &xdata_in,
                                           std::vector<double> &ydata_in,
-                                          ModelFunction<T> model,
+                                          ModelFunction model,
                                           CostFunction costFunction,
                                           double regularization,
                                           StringDoubleMap &paramsMap,
@@ -178,14 +157,13 @@ namespace FittingAlgorithms{
       return errors;
     }
 
-    template <typename T>
-    FitResult fit(std::vector<T>& xdata_in,
+    FitResult fit(std::vector<double>& xdata_in,
                   std::vector<double>& ydata_in,
-                  ModelFunction<T> model,
+                  ModelFunction model,
                   StringDoubleMap& initialGuesses,
-                  Parameters gnParams = Parameters(),
-                  CostFunction costFunction = squaredError,
-                  StringDoubleMap extraParameters = {}){
+                  Parameters gnParams,
+                  CostFunction costFunction,
+                  StringDoubleMap extraParameters){
       
       vector fittingParams = mapToEigen(initialGuesses);
       int n                = initialGuesses.size();
