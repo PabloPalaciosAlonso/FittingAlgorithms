@@ -38,7 +38,7 @@ struct FitResult {
  *                        where `params` are the parameters to be fitted
  *                        and `extraParams` are fixed parameters.
  * @param initialGuesses  Initial guesses for each fitted parameter.
- * @param gnParams        Gauss–Newton solver parameters.
+ * @param gnParams        Gauss–Newton parameters.
  * @param costFunction    Cost function (default: squared error).
  * @param extraParameters Additional model parameters that remain fixed.
  *
