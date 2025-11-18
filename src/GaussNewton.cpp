@@ -61,7 +61,7 @@ namespace FittingAlgorithms{
                             StringDoubleMap& fittingParameters,
                             StringDoubleMap& extraParameters){
       
-      std::vector<double> y_predV(xdata_in.size()); // Reserva espacio para el resultado
+      std::vector<double> y_predV(xdata_in.size());
 
       std::transform(xdata_in.begin(), xdata_in.end(), y_predV.begin(),
                      [&](const double x_element) {
@@ -70,7 +70,10 @@ namespace FittingAlgorithms{
       
       vector residuals(y_predV.size());
       for(int i = 0; i<ydata_in.size(); i++){
-        residuals(i) = sqrt(costFunction(ydata_in[i], y_predV[i]));
+        residuals(i) =  sqrt(costFunction(ydata_in[i], y_predV[i]));
+        if ((ydata_in[i]-y_predV[i])<0){
+          residuals(i)*=-1;
+        }
       }
       return residuals;
     }
