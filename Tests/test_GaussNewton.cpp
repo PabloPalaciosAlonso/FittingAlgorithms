@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "GaussNewton.h"
 #include "costFunctions.h"
-
+#include "defines.h"
 
 namespace FittingAlgorithms{
   namespace GaussNewton{
@@ -15,6 +15,9 @@ Eigen::MatrixXd computeJacobian(std::vector<double>& xdata,
   }
 }
 
+using namespace FittingAlgorithms;
+using namespace GaussNewton;
+
 double polynomicModel(double x,
                       const StringDoubleMap& fittingParams,
                       const StringDoubleMap& extraParams) {
@@ -23,9 +26,6 @@ double polynomicModel(double x,
   double c = fittingParams.at("c");
   return a*x*x + b*x + c;
 };
-
-using namespace FittingAlgorithms;
-using namespace GaussNewton;
 
 TEST(GaussNewton, JacobianPolynomicModel){
 
