@@ -8,15 +8,19 @@ FetchContent_MakeAvailable(googletest)
 
 include(GoogleTest)
 
-set(TEST_SOURCES
-  test_GaussNewton.cpp
-  test_ParallelTempering.cpp
-)
-foreach(source_file IN LISTS TEST_SOURCES)
-    add_executable(${source_file} ${source_file})
-    target_link_libraries(${source_file} 
-      PRIVATE 
-      fittingalgorithms
-      GTest::gtest_main)
-    gtest_discover_tests(${source_file}) 
-endforeach()
+# EIGEN VARIANT
+add_executable(test_GN_eigen test_GaussNewton.cpp)
+target_compile_definitions(test_GN_eigen PRIVATE USE_EIGEN)
+target_link_libraries(test_GN_eigen PRIVATE fittingalgorithms GTest::gtest_main)
+gtest_discover_tests(test_GN_eigen)
+
+# BOOST VARIANT
+add_executable(test_GN_boost test_GaussNewton.cpp)
+target_compile_definitions(test_GN_boost PRIVATE USE_EIGEN=0)
+target_link_libraries(test_GN_boost PRIVATE fittingalgorithms GTest::gtest_main)
+gtest_discover_tests(test_GN_boost)
+
+add_executable(test_PT_eigen test_ParallelTempering.cpp)
+target_compile_definitions(test_PT_eigen PRIVATE USE_EIGEN)
+target_link_libraries(test_PT_eigen PRIVATE fittingalgorithms GTest::gtest_main)
+gtest_discover_tests(test_PT_eigen)
