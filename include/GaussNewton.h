@@ -6,6 +6,7 @@
 #include <string>
 #include "costFunctions.h"
 #include "defines.h"
+#include "GaussNewton_detail.h"
 
 namespace FittingAlgorithms {
 namespace GaussNewton {
@@ -44,14 +45,55 @@ struct FitResult {
  *
  * @return FitResult containing final fitted parameters and their standard errors.
  */
+  template <class T>
+  FitResult fit(std::vector<T>& xdata_in,
+                std::vector<double>& ydata_in,
+                ModelFunction<T> model,
+                StringDoubleMap& initialGuesses,
+                Parameters gnParams = Parameters(),
+                CostFunction costFunction = squaredError,
+                StringDoubleMap extraParameters = {}){
+    
+    vector fittingParams = mapToEigen(initialGuesses);
+    int n                = initialGuesses.size();
+    vector y_data        = Eigen::Map<const vector>(ydata_in.data(), ydata_in.size());
+    StringDoubleMap fittingParamsMap = initialGuesses;
+    
+    vector residual;
+    for (int i = 0; i < gnParams.maxIterations; ++i) {
+      
+      residual = computeResiduals(xdata_in, ydata_in,
+                                  model, costFunction,
+                                  fittingParamsMap, extraParameters);
+      
+      matrix pseudoJ      = computePseudoJacobian(xdata_in, ydata_in,
+                                                  model, costFunction,
+                                                  gnParams.regularization,
+                                                  fittingParamsMap,
+                                                  extraParameters);
+      vector delta_params = - pseudoJ * residual;
+      double currentError = (delta_params.array() / fittingParams.array()).matrix().norm()/n;
+      
+      fittingParams += delta_params;
+      updateMapFromEigen(fittingParamsMap, fittingParams);
+      
+      if (i>0 and i%gnParams.printSteps == 0)
+        printParameters(fittingParamsMap, i);
+      
+      if (currentError < gnParams.tolerance) {
+        break;
+      }
+    }
+    
+    auto errors = computeStandardErrors(xdata_in, ydata_in,
+                                        model, costFunction,
+                                        gnParams.regularization,
+                                        fittingParamsMap,
+                                        extraParameters,
+                                        residual);
+    
+    return FitResult{fittingParamsMap, errors};
+  }
   
-FitResult fit(std::vector<double>& xdata_in,
-              std::vector<double>& ydata_in,
-              ModelFunction model,
-              StringDoubleMap& initialGuesses,
-              Parameters gnParams = Parameters(),
-              CostFunction costFunction = squaredError,
-              StringDoubleMap extraParameters = {});
-
 } // namespace GaussNewton
 } // namespace FittingAlgorithms

@@ -3,18 +3,6 @@
 #include "costFunctions.h"
 #include "defines.h"
 
-namespace FittingAlgorithms{
-  namespace GaussNewton{
-
-Eigen::MatrixXd computeJacobian(std::vector<double>& xdata,
-                                std::vector<double>& ydata,
-                                ModelFunction model,
-                                CostFunction costFunction,
-                                StringDoubleMap& paramsMap,
-                                StringDoubleMap& extraParameters);
-  }
-}
-
 using namespace FittingAlgorithms;
 using namespace GaussNewton;
 
@@ -49,8 +37,8 @@ TEST(GaussNewton, JacobianPolynomicModel){
     Jtheo[ncols*point+2] = -1.0;
   }
 
-  Eigen::MatrixXd Jnum = computeJacobian(pointsX, pointsY, polynomicModel,
-                                         squaredError, employedParams, extraParams);
+  Eigen::MatrixXd Jnum = computeJacobian<double>(pointsX, pointsY, polynomicModel,
+                                                 squaredError, employedParams, extraParams);
   
   for (int row = 0; row<nrows; row++){
     for (int col = 0; col<ncols; col++){
@@ -82,8 +70,8 @@ TEST(GaussNewton, fitPolynomicFunction){
 
   StringDoubleMap initialGuesses = {{"a", 10.0}, {"b", 10.0}, {"c", 6.0}};
 
-  FitResult result = fit(pointsX, pointsY, polynomicModel,
-                         initialGuesses, gnParams);
+  FitResult result = fit<double>(pointsX, pointsY, polynomicModel,
+                                 initialGuesses, gnParams);
 
   StringDoubleMap fittedParams = result.parameters;
 
