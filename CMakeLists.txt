@@ -16,12 +16,15 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 
+
 # Create interface target for consumers
 add_library(fittingalgorithms INTERFACE)
 target_include_directories(fittingalgorithms INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+
+add_library(FittingAlgorithms::fittingalgorithms ALIAS fittingalgorithms)
 
 # Add actual library sources
 add_subdirectory(src)
