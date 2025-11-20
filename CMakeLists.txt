@@ -17,8 +17,8 @@ find_package(OpenMP)
 add_library(fittingalgorithms INTERFACE)
 
 target_include_directories(fittingalgorithms INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include       # GaussNewton.h público
-    ${CMAKE_CURRENT_SOURCE_DIR}/src           # GaussNewton_detail.h interno
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src    
 )
 
 target_link_libraries(fittingalgorithms INTERFACE
