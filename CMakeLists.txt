@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 3.15)
 
 project(FittingAlgorithms VERSION 0.0.1 LANGUAGES CXX)
 
-#option(BUILD_PYTHON_WRAPPER "Build the Python wrapper using pybind11" OFF)
-option(BUILD_DOCS "Build the documentation using Doxygen" ON)
-option(BUILD_TESTS "Build the tests using CTest" ON)
-set(CMAKE_CXX_STANDARD 20)
+
+#option(FA_BUILD_PYTHON_WRAPPER "Build the Python wrapper using pybind11" OFF)
+option(FA_BUILD_DOCS "Build the documentation using Doxygen" ON)
+option(FA_BUILD_TESTS "Build the tests using CTest" ON)
+set(FA_CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD ${FA_CMAKE_CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -28,13 +30,15 @@ add_subdirectory(src)
 target_link_libraries(fittingalgorithms INTERFACE GaussNewton ParallelTempering)
 
 
-if(BUILD_TESTS)
+
+if(FA_BUILD_TESTS)
   enable_testing()
   add_subdirectory(Tests)
 endif()
 
 
-if(BUILD_DOCS)
+
+if(FA_BUILD_DOCS)
   add_subdirectory(docs)
 endif()
 
