@@ -17,11 +17,3 @@ target_include_directories(ParallelTempering PUBLIC
 if(OpenMP_CXX_FOUND)
     target_link_libraries(ParallelTempering PRIVATE OpenMP::OpenMP_CXX)
 endif()
-
-# Export implementation libraries for install
-install(TARGETS GaussNewton ParallelTempering
-    EXPORT fittingalgorithmsTargets
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-)
