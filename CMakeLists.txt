@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(FittingAlgorithms VERSION v0.0.1 LANGUAGES CXX)
+project(FittingAlgorithms VERSION 0.0.1 LANGUAGES CXX)
 
 #option(BUILD_PYTHON_WRAPPER "Build the Python wrapper using pybind11" OFF)
 option(BUILD_DOCS "Build the documentation using Doxygen" ON)
