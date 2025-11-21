@@ -61,11 +61,11 @@ namespace FittingAlgorithms {
 
       for (int i = 0; i < gnParams.maxIterations; ++i) {
       
-        std::vector<double> delta_params = computeParametersIncrement(xdata_in, ydata_in,
-                                                                      model, costFunction,
-                                                                      gnParams.regularization,
-                                                                      fittingParamsMap,
-                                                                      extraParameters);           
+        auto delta_params = computeParametersIncrement(xdata_in, ydata_in,
+						       model, costFunction,
+						       gnParams.regularization,
+						       fittingParamsMap,
+						       extraParameters);           
         addStdVectors(fittingParams,delta_params);
         updateMapFromSTDVector(fittingParamsMap, fittingParams);
       
