@@ -1,4 +1,7 @@
-#include "GaussNewton.h"
+#include <Eigen/Dense>
+#include <vector>
+#include <map>
+#include <string>
 
 namespace FittingAlgorithms{
   namespace GaussNewton{
@@ -45,7 +48,7 @@ namespace FittingAlgorithms{
         ++it;  // Move to the next element in the map
       }
     }
-  
+    
     inline void printParameters(const StringDoubleMap& parameters, int iter) {
       std::cout<<"Iteration "<<iter<<std::endl;
       for (const auto& param : parameters) {
@@ -53,10 +56,11 @@ namespace FittingAlgorithms{
       }
       std::cout<<"\n";
     }
-    
-    vector computeResiduals(std::vector<double> &xdata_in,
+
+    template<class T>
+    vector computeResiduals(std::vector<T> &xdata_in,
                             std::vector<double> &ydata_in,
-                            ModelFunction model,
+                            ModelFunction<T> model,
                             CostFunction costFunction,
                             StringDoubleMap& fittingParameters,
                             StringDoubleMap& extraParameters){
@@ -64,7 +68,7 @@ namespace FittingAlgorithms{
       std::vector<double> y_predV(xdata_in.size());
 
       std::transform(xdata_in.begin(), xdata_in.end(), y_predV.begin(),
-                     [&](const double x_element) {
+                     [&](const T x_element) {
                        return model(x_element, fittingParameters, extraParameters);
                      });
       
@@ -79,9 +83,10 @@ namespace FittingAlgorithms{
     }
     
     // Function to compute the Jacobian matrix numerically using finite differences
-    Eigen::MatrixXd computeJacobian(std::vector<double> &xdata_in,
+    template<class T>
+    Eigen::MatrixXd computeJacobian(std::vector<T> &xdata_in,
                                     std::vector<double> &ydata_in,
-                                    ModelFunction model,
+                                    ModelFunction<T> model,
                                     CostFunction costFunction,
                                     StringDoubleMap &paramsMap,
                                     StringDoubleMap &extraParameters) {
@@ -109,10 +114,11 @@ namespace FittingAlgorithms{
       }
       return J;
     }
-  
-    matrix computePseudoJacobian(std::vector<double> &xdata_in,
+
+    template<class T>
+    matrix computePseudoJacobian(std::vector<T> &xdata_in,
                                  std::vector<double> &ydata_in,
-                                 ModelFunction model,
+                                 ModelFunction<T> model,
                                  CostFunction costFunction,
                                  double regularization,
                                  StringDoubleMap &paramsMap,
@@ -130,9 +136,10 @@ namespace FittingAlgorithms{
       return pseudoJ;
     }
 
-    StringDoubleMap computeStandardErrors(std::vector<double> &xdata_in,
+    template<class T>
+    StringDoubleMap computeStandardErrors(std::vector<T> &xdata_in,
                                           std::vector<double> &ydata_in,
-                                          ModelFunction model,
+                                          ModelFunction<T> model,
                                           CostFunction costFunction,
                                           double regularization,
                                           StringDoubleMap &paramsMap,
@@ -155,55 +162,6 @@ namespace FittingAlgorithms{
         errors[std::next(paramsMap.begin(), i)->first] = std::sqrt(variance * JTJ_inv(i, i));
       }
       return errors;
-    }
-
-    FitResult fit(std::vector<double>& xdata_in,
-                  std::vector<double>& ydata_in,
-                  ModelFunction model,
-                  StringDoubleMap& initialGuesses,
-                  Parameters gnParams,
-                  CostFunction costFunction,
-                  StringDoubleMap extraParameters){
-      
-      vector fittingParams = mapToEigen(initialGuesses);
-      int n                = initialGuesses.size();
-      vector y_data        = Eigen::Map<const vector>(ydata_in.data(), ydata_in.size());
-      StringDoubleMap fittingParamsMap = initialGuesses;
-    
-      vector residual;
-      for (int i = 0; i < gnParams.maxIterations; ++i) {
-        
-        residual = computeResiduals(xdata_in, ydata_in,
-                                    model, costFunction,
-                                    fittingParamsMap, extraParameters);
-        
-        matrix pseudoJ      = computePseudoJacobian(xdata_in, ydata_in,
-                                                    model, costFunction,
-                                                    gnParams.regularization,
-                                                    fittingParamsMap,
-                                                    extraParameters);
-        vector delta_params = - pseudoJ * residual;
-        double currentError = (delta_params.array() / fittingParams.array()).matrix().norm()/n;
-      
-        fittingParams += delta_params;
-        updateMapFromEigen(fittingParamsMap, fittingParams);
-      
-        if (i>0 and i%gnParams.printSteps == 0)
-          printParameters(fittingParamsMap, i);
-      
-        if (currentError < gnParams.tolerance) {
-          break;
-        }
-      }
-
-      auto errors = computeStandardErrors(xdata_in, ydata_in,
-                                          model, costFunction,
-                                          gnParams.regularization,
-                                          fittingParamsMap,
-                                          extraParameters,
-                                          residual);
-    
-      return FitResult{fittingParamsMap, errors};
     }
   }
 }

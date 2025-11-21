@@ -6,9 +6,9 @@
 #include <vector>
 #include <cfloat>
 #include <omp.h>
-#include<random>
 #include "defines.h"
 #include "costFunctions.h"
+#include "ParallelTempering_detail.h"
 
 namespace FittingAlgorithms{
 namespace ParallelTempering {
@@ -40,33 +40,71 @@ namespace ParallelTempering {
    *
    * @return StringDoubleMap Estimated model parameters.
    */
-  StringDoubleMap fit(std::vector<double> &xdata_in,
+  template <class T>
+  StringDoubleMap fit(std::vector<T> &xdata_in,
                       std::vector<double> &ydata_in,
-                      ModelFunction model,
+                      ModelFunction<T> model,
                       std::vector<StringDoubleMap> &initialGuesses,
                       Parameters params = Parameters(),
                       CostFunction costFunction = squaredError,
-                      StringDoubleMap extraParameters = StringDoubleMap{});
-
-  /**
-   * @overload fit
-   *
-   * @brief Fits the model parameters using a single initial guess.
-   *
-   * This overload is equivalent to the multi-chain version, but duplicates the
-   * provided initial parameter map to initialize all chains.
-   *
-   * @param initialGuess Initial parameter map to be replicated across all chains.
-   */
-  StringDoubleMap fit(std::vector<double> &xdata,
-                      std::vector<double> &ydata,
-                      ModelFunction model,
-                      StringDoubleMap &initialGuess,
-                      Parameters params = Parameters(),
-                      CostFunction costFunction = squaredError,
-                      StringDoubleMap extraParameters = StringDoubleMap{});
-
-
+                      StringDoubleMap extraParameters = StringDoubleMap{}){
+    
+    //Initialize all the parameters
+    int nTemperatures = params.temperatures.size();
+    double minError   = DBL_MAX;
+    std::vector<StringDoubleMap> allFittingParameters = initialGuesses;
+    std::vector<StringDoubleMap> optimalFittingParameters= initialGuesses;
+    std::vector<double> optimalErrors(nTemperatures, minError);
+    StringDoubleMap bestParameters;
+    
+    auto start           = std::chrono::high_resolution_clock::now();
+    int stepsSameError   = 0;
+    bool minErrorChanged = false;
+    
+    for (int step = 0; step < params.maxIterations; ++step) {
+      // Update errors for all temperatures in parallel
+      std::vector<double> errors(nTemperatures);
+      
+#pragma omp parallel for num_threads(params.numThreads)
+      for (int tempIdx = 0; tempIdx < nTemperatures; ++tempIdx) {
+        errors[tempIdx] = forwardTimeMC(xdata_in, ydata_in, model, allFittingParameters[tempIdx],
+                                        params.temperatures[tempIdx], params.jumpSize[tempIdx],
+                                        costFunction, extraParameters);
+        
+        // Update optimal parameters for this temperature
+        updateOptimalParameters(tempIdx, errors[tempIdx], optimalErrors, 
+                                allFittingParameters, optimalFittingParameters);
+      }
+      
+      if (step % params.printSteps == 0 and step > 0){
+        auto now = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = now - start;
+        printStepProgress(step, params.maxIterations, start,
+                          elapsed.count(), optimalErrors,
+                          optimalFittingParameters);
+        start = now;
+      }
+      
+      // Perform swaps
+      if (step % params.numStepsSwap == 0 and step > 0) {
+        
+        tryToSwapTemperatures(params.temperatures, allFittingParameters,
+                              optimalFittingParameters, optimalErrors);
+        
+        // Update all fitting parameters after swaps
+        allFittingParameters = optimalFittingParameters;
+        
+        checkAndUpdateBestParameters(optimalErrors, optimalFittingParameters,
+                                     minError, bestParameters, stepsSameError,
+                                     minErrorChanged, params.numStepsSwap);
+        
+        if (stepsSameError >= params.numStepsFinish || minError < params.tolerance) {
+          break;
+        }
+      }
+    }
+    return bestParameters;
+  }
 } // namespace ParallelTempering
 } // namespace FittingAlgorithms
 

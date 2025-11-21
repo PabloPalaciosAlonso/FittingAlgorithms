@@ -36,10 +36,13 @@ TEST(ParallelTempering, fitPolynomicFunction){
   ptParams.tolerance      = 1e-20;
   ptParams.printSteps     = 100000;
     
-  StringDoubleMap initialGuesses = {{"a", 10.0}, {"b", 10.0}, {"c", 6.0}};
+  StringDoubleMap initialGuess_0 = {{"a", 10.0}, {"b", 10.0}, {"c", 6.0}};
+
+  std::vector<StringDoubleMap> initialGuesses(ptParams.temperatures.size());
+  std::fill(initialGuesses.begin(), initialGuesses.end(), initialGuess_0);
   
-  StringDoubleMap fittedParams = fit(pointsX, pointsY, polynomicModel,
-                                     initialGuesses, ptParams);
+  StringDoubleMap fittedParams = fit<double>(pointsX, pointsY, polynomicModel,
+                                             initialGuesses, ptParams);
 
   double tol = 1e-8;
 
