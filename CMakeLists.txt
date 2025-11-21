@@ -27,6 +27,8 @@ if(OpenMP_CXX_FOUND)
     target_link_libraries(fittingalgorithms INTERFACE OpenMP::OpenMP_CXX)
 endif()
 
+add_library(FittingAlgorithms::fittingalgorithms ALIAS fittingalgorithms)
+
 if(FA_BUILD_TESTS)
     enable_testing()
     add_subdirectory(Tests)
