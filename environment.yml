@@ -2,13 +2,15 @@ name: fittingAlgorithms
 channels:
   - conda-forge
   - nodefaults
-
 dependencies:
+  - python
+  - pip
   - c-compiler
   - cxx-compiler
   - cmake
   - make
   - eigen
+  - boost
   - doxygen
   - pip:
     - breathe==4.35.0
