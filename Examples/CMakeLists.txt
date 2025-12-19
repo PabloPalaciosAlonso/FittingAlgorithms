@@ -1,0 +1,7 @@
+add_executable(fa_example_gn ExampleGN.cpp)
+add_executable(fa_example_pt ExamplePT.cpp)
+add_executable(fa_example_all ExampleAll.cpp)
+
+target_link_libraries(fa_example_gn PRIVATE FittingAlgorithms::fittingalgorithms)
+target_link_libraries(fa_example_pt PRIVATE FittingAlgorithms::fittingalgorithms)
+target_link_libraries(fa_example_all PRIVATE FittingAlgorithms::fittingalgorithms)
