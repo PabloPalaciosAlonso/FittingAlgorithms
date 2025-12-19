@@ -47,3 +47,17 @@ jobs:
       run: |
         ctest --output-on-failure --test-dir build
       shell: micromamba-shell {0}
+
+    - name: Setup emscripten
+      run: |
+        emsdk update
+        emsdk install 4.0.10
+
+    - name: Configure and compile the project in web mode
+      run: |
+        emsdk activate 4.0.22
+        EMSDK_PATH=$(python3 -c "import site; print(site.getsitepackages()[0])")/emsdk
+        source "${EMSDK_PATH}/emsdk_env.sh"
+        emcmake cmake -B build_web -DFA_BUILD_TESTS=ON -DFA_BUILD_DOCS=OFF -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX
+        cmake --build build_web --parallel
+      shell: micromamba-shell {0}
