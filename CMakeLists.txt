@@ -7,9 +7,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-option(BUILD_DOCS "Build the documentation using Doxygen" ON)
-option(BUILD_TESTS "Build the tests using CTest" ON)
-
 find_package(Eigen3 REQUIRED)
 find_package(OpenMP)
 
