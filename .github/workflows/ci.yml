@@ -51,7 +51,8 @@ jobs:
     - name: Setup emscripten
       run: |
         emsdk update
-        emsdk install 4.0.10
+        emsdk install 4.0.22
+      shell: micromamba-shell {0}
 
     - name: Configure and compile the project in web mode
       run: |
