@@ -5,6 +5,7 @@ option(FA_BUILD_DOCS "Build the documentation using Doxygen" ON)
 option(FA_BUILD_TESTS "Build the tests using CTest" ON)
 option(FA_USE_EIGEN "Use Eigen library if found" ON)
 option(FA_USE_OPENMP "Enable OpenMP parallelization" ON)
+option(FA_BUILD_EXAMPLES "Build the usage examples" ON)
 
 if (EMSCRIPTEN)
 	# Avoid system-injected linker flags
@@ -22,9 +23,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-option(BUILD_DOCS "Build the documentation using Doxygen" ON)
-option(BUILD_TESTS "Build the tests using CTest" ON)
-option(FA_BUILD_EXAMPLES "Build the usage examples" ON)
+
 
 if(NOT EMSCRIPTEN)
   find_package(Boost)
