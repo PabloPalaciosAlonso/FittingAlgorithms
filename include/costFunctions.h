@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #include <stdexcept>
+#include "defines.h"
 
 
 namespace FittingAlgorithms{
@@ -12,7 +13,7 @@ namespace FittingAlgorithms{
    * @param ypred Predicted value.
    * @return The squared error \f$(y_{\text{target}} - y_{\text{pred}})^2\f$.
    */
-  inline double squaredError(double ytarget, double ypred){
+  inline double squaredError(double ytarget, double ypred, const StringDoubleMap /*params*/){
     return (ytarget-ypred)*(ytarget-ypred);
   }
 
@@ -23,7 +24,7 @@ namespace FittingAlgorithms{
    * @param ypred Predicted value.
    * @return The squared relative error \f$(1 - y_{\text{pred}}/y_{\text{target}})^2\f$.
    */
-  inline double squaredRelativeError(double ytarget, double ypred){
+  inline double squaredRelativeError(double ytarget, double ypred, const StringDoubleMap /*params*/){
     if (ytarget == 0.0)
       throw std::runtime_error("squaredRelativeError: ytarget cannot be zero.");
     double relativeError = 1.0 - ypred/ytarget;
@@ -37,7 +38,7 @@ namespace FittingAlgorithms{
    * @return The squared logarithmic error
    *         \f$(\log(y_{\text{target}} / y_{\text{pred}}))^2\f$.
    */
-  inline double squaredLogarithmicError(double ytarget, double ypred){
+  inline double squaredLogarithmicError(double ytarget, double ypred, const StringDoubleMap /*params*/){
     if (ytarget*ypred <= 0.0)
       throw std::runtime_error("squaredLogarithmicError: ytarget and ypred must have the same sign.");
     double logarithmicError = log(ytarget/ypred); 

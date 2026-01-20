@@ -194,7 +194,7 @@ namespace FittingAlgorithms{
       
       auto calculateError = [&](const double& x_element, const double& y_actual) {
         double y_pred = model(x_element, fittingParameters, extraParameters);
-        return costFunction(y_actual, y_pred);
+        return costFunction(y_actual, y_pred, fittingParameters);
       };
       
       double totalError = std::transform_reduce(xdata_in.begin(),
