@@ -29,7 +29,7 @@ namespace FittingAlgorithms{
       
       vector residuals(y_predV.size());
       for(int i = 0; i<ydata_in.size(); i++){
-        residuals(i) =  sqrt(costFunction(ydata_in[i], y_predV[i]));
+        residuals(i) =  sqrt(costFunction(ydata_in[i], y_predV[i], fittingParameters));
         if ((ydata_in[i]-y_predV[i])<0){
           residuals(i)*=-1;
         }
