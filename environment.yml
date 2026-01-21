@@ -2,14 +2,17 @@ name: fittingAlgorithms
 channels:
   - conda-forge
   - nodefaults
-
 dependencies:
+  - python
+  - pip
   - c-compiler
   - cxx-compiler
   - cmake
   - make
   - eigen
+  - boost
   - doxygen
+  - emsdk
   - pip:
     - breathe==4.35.0
     - sphinx==7.4.7

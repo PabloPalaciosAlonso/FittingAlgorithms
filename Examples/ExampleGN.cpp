@@ -1,24 +1,26 @@
+#include <GaussNewton.h>
+#include <costFunctions.h>
+#include <defines.h>
+
+#include <cmath>
 #include <iostream>
-#include <vector>
 #include <map>
 #include <string>
-#include <cmath>
-#include "../src/GaussNewton.h"
-#include "../src/utils/costFunctions.h"
-#include "../src/utils/defines.h"
+#include <vector>
 
 // Modelo polinómico
-double model(double x, const std::map<std::string, double>& params,
-             const std::map<std::string, double>& extraParams) {
-    double a = params.at("a");
-    double b = params.at("b");
-    double c = params.at("c");
-    return a * x * x + b * x + c;
+double model(double x, const std::map<std::string, double> &params,
+             const std::map<std::string, double> &extraParams) {
+  double a = params.at("a");
+  double b = params.at("b");
+  double c = params.at("c");
+  return a * x * x + b * x + c;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   // Parámetros verdaderos para generar datos
-  std::map<std::string, double> trueParameters = {{"a", 2.5}, {"b", 1.2}, {"c", 3.33}};
+  std::map<std::string, double> trueParameters = {
+      {"a", 2.5}, {"b", 1.2}, {"c", 3.33}};
 
   // Generar los datos
   std::vector<double> xdata(100);
@@ -27,7 +29,7 @@ int main(int argc, char* argv[]) {
     xdata[i] = static_cast<double>(i) / 10.0; // x en el rango [0, 10]
     ydata[i] = model(xdata[i], trueParameters, {});
   }
-  
+
   // Configurar parámetros de Gauss-Newton
   FittingAlgorithms::GaussNewton::Parameters gnParams;
   gnParams.maxIterations = 10000;
@@ -36,23 +38,24 @@ int main(int argc, char* argv[]) {
   gnParams.regularization = 1e-5;
 
   // Suposiciones iniciales
-  std::map<std::string, double> initialGuesses = {{"a", 1.0}, {"b", 1.0}, {"c", 6.0}};
+  std::map<std::string, double> initialGuesses = {
+      {"a", 1.0}, {"b", 1.0}, {"c", 6.0}};
 
   //  FittingAlgorithms::ModelFunction<double> myModel = model;
 
-  auto result = FittingAlgorithms::GaussNewton::fit<double>(xdata, ydata, model,
-                                                            initialGuesses, gnParams);
-  
+  auto result = FittingAlgorithms::GaussNewton::fit<double>(
+      xdata, ydata, model, initialGuesses, gnParams);
+
   // Imprimir resultados
-    std::cout << "Fitted Parameters:\n";
-    for (const auto& param : result.parameters) {
-      std::cout << param.first << ": " << param.second << "\n";
-    }
-    
-    std::cout << "Target Parameters:\n";
-    for (const auto& param : trueParameters) {
-      std::cout << param.first << ": " << param.second << "\n";
-    }
-    
-    return 0;
+  std::cout << "Fitted Parameters:\n";
+  for (const auto &param : result.parameters) {
+    std::cout << param.first << ": " << param.second << "\n";
+  }
+
+  std::cout << "Target Parameters:\n";
+  for (const auto &param : trueParameters) {
+    std::cout << param.first << ": " << param.second << "\n";
+  }
+
+  return 0;
 }
