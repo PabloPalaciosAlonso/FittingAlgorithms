@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
   std::vector<StringDoubleMap> initialGuesses(ptParams.temperatures.size(),
                                               seed);
 
-  auto result = ParallelTempering::fit<double>(xdata, ydata, model,
-                                               initialGuesses, ptParams);
+  auto result = ParallelTempering::fit<double, double>(xdata, ydata, model,
+                                                       initialGuesses, ptParams);
 
   // Imprimir resultados
   std::cout << "Fitted Parameters:\n";

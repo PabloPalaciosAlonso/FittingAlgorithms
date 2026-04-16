@@ -48,10 +48,10 @@ namespace FittingAlgorithms {
     template <class T>
     FitResult fit(std::vector<T>& xdata_in,
                   std::vector<double>& ydata_in,
-                  ModelFunction<T> model,
+                  ModelFunction<T,double> model,
                   const StringDoubleMap& initialGuesses,
                   Parameters gnParams = Parameters(),
-                  CostFunction costFunction = squaredError,
+                  CostFunction<double> costFunction = squaredError,
                   StringDoubleMap extraParameters = {}){
       
       int n = initialGuesses.size();

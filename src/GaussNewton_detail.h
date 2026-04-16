@@ -15,8 +15,8 @@ namespace FittingAlgorithms{
     template<class T>
     vector computeResiduals(std::vector<T> &xdata_in,
                             std::vector<double> &ydata_in,
-                            ModelFunction<T> model,
-                            CostFunction costFunction,
+                            ModelFunction<T, double> model,
+                            CostFunction<double> costFunction,
                             StringDoubleMap& fittingParameters,
                             StringDoubleMap& extraParameters){
       
@@ -40,8 +40,8 @@ namespace FittingAlgorithms{
     template<class T>
     matrix computeJacobian(std::vector<T> &xdata_in,
                            std::vector<double> &ydata_in,
-                           ModelFunction<T> model,
-                           CostFunction costFunction,
+                           ModelFunction<T, double> model,
+                           CostFunction<double> costFunction,
                            StringDoubleMap &paramsMap,
                            StringDoubleMap &extraParameters) {
       // Create a map to store perturbed parameters
@@ -74,8 +74,8 @@ namespace FittingAlgorithms{
     template<class T>
     matrix computePseudoJacobian(std::vector<T> &xdata_in,
                                  std::vector<double> &ydata_in,
-                                 ModelFunction<T> model,
-                                 CostFunction costFunction,
+                                 ModelFunction<T, double> model,
+                                 CostFunction<double> costFunction,
                                  double regularization,
                                  StringDoubleMap &paramsMap,
                                  StringDoubleMap &extraParameters){
@@ -102,8 +102,8 @@ namespace FittingAlgorithms{
     template<class T>
     std::vector<double> computeParametersIncrement(std::vector<T> &xdata_in,
                                                    std::vector<double> &ydata_in,
-                                                   ModelFunction<T> model,
-                                                   CostFunction costFunction,
+                                                   ModelFunction<T, double> model,
+                                                   CostFunction<double> costFunction,
                                                    double regularization,
                                                    StringDoubleMap &fittingParamsMap,
                                                    StringDoubleMap &extraParameters) {
@@ -128,8 +128,8 @@ namespace FittingAlgorithms{
     template<class T>
     StringDoubleMap computeStandardErrors(std::vector<T> &xdata_in,
                                           std::vector<double> &ydata_in,
-                                          ModelFunction<T> model,
-                                          CostFunction costFunction,
+                                          ModelFunction<T, double> model,
+                                          CostFunction<double> costFunction,
                                           double regularization,
                                           StringDoubleMap &paramsMap,
                                           StringDoubleMap &extraParameters){

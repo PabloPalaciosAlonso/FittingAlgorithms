@@ -190,16 +190,16 @@ namespace FittingAlgorithms{
       }
     }
 
-    template<class T>
-    double computeAverageError(const std::vector<T>& xdata_in,
-                               const std::vector<double>& ydata_in,
-                               const ModelFunction<T>& model,
+    template<class T1, class T2>
+    double computeAverageError(const std::vector<T1>& xdata_in,
+                               const std::vector<T2>& ydata_in,
+                               const ModelFunction<T1, T2>& model,
                                const StringDoubleMap& fittingParameters,
-                               const CostFunction& costFunction,                               
+                               const CostFunction<T2>& costFunction,                               
                                const StringDoubleMap& extraParameters) {
       
-      auto calculateError = [&](const T& x_element, const double& y_actual) {
-        double y_pred = model(x_element, fittingParameters, extraParameters);
+      auto calculateError = [&](const T1& x_element, const T2& y_actual) {
+        T2 y_pred = model(x_element, fittingParameters, extraParameters);
         return costFunction(y_actual, y_pred);
       };
       
@@ -213,14 +213,14 @@ namespace FittingAlgorithms{
       return totalError / xdata_in.size();
     }
 
-    template<class T>
-    double forwardTimeMC(std::vector<T> &xdata,
-                         std::vector<double> &ydata,
-                         ModelFunction<T> model,
+    template<class T1, class T2 = double>
+    double forwardTimeMC(std::vector<T1> &xdata,
+                         std::vector<T2> &ydata,
+                         ModelFunction<T1, T2> model,
                          StringDoubleMap &fittingParameters,
                          double temperature,
                          double &jumpSize,
-                         CostFunction costFunc,
+                         CostFunction<T2> costFunc,
                          StringDoubleMap &extraParameters){
       
       double oldError           = computeAverageError(xdata, ydata, model,
