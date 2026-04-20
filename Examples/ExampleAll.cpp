@@ -95,9 +95,8 @@ int main() {
 
   auto ptX = xdata;
   auto ptY = ydata;
-  auto ptResult = FittingAlgorithms::ParallelTempering::fit<double, double>(
-      ptX, ptY, dampedLineModel, ptInitial, ptParams,
-      FittingAlgorithms::squaredLogarithmicError, extraParameters);
+  auto ptResult = FittingAlgorithms::ParallelTempering::fit<double, double, StringDoubleMap>(ptX, ptY, dampedLineModel, ptInitial, ptParams,
+                                                                                             FittingAlgorithms::squaredLogarithmicError, extraParameters);
 
   printParameters(ptResult, "Parallel Tempering fit");
 

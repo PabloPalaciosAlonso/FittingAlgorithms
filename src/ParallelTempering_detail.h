@@ -213,10 +213,10 @@ namespace FittingAlgorithms{
       return totalError / xdata_in.size();
     }
 
-    template<class T1, class T2 = double>
+    template<class T1, class T2 = double, class T3 = StringDoubleMap>
     double forwardTimeMC(std::vector<T1> &xdata,
                          std::vector<T2> &ydata,
-                         ModelFunction<T1, T2> model,
+                         ModelFunction<T1, T2, T3> model,
                          StringDoubleMap &fittingParameters,
                          double temperature,
                          double &jumpSize,

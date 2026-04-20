@@ -43,8 +43,8 @@ TEST(ParallelTempering, fitPolynomicFunction){
   std::vector<StringDoubleMap> initialGuesses(ptParams.temperatures.size());
   std::fill(initialGuesses.begin(), initialGuesses.end(), initialGuess_0);
   
-  StringDoubleMap fittedParams = fit<double, double>(pointsX, pointsY, polynomicModel,
-                                                     initialGuesses, ptParams);
+  StringDoubleMap fittedParams = fit<double, double, StringDoubleMap>(pointsX, pointsY, polynomicModel,
+                                                                      initialGuesses, ptParams);
 
   double tol = 1e-8;
 
@@ -117,8 +117,8 @@ TEST(ParallelTempering, fitComplexFunction){
   std::vector<StringDoubleMap> initialGuesses(ptParams.temperatures.size());
   std::fill(initialGuesses.begin(), initialGuesses.end(), initialGuess_0);
   
-  StringDoubleMap fittedParams = fit<double, std::complex<double>>(pointsX, pointsY, complexExponential,
-                                                                   initialGuesses, ptParams, squaredErrorComplex);
+  StringDoubleMap fittedParams = fit<double, std::complex<double>, StringDoubleMap>(pointsX, pointsY, complexExponential,
+                                                                                    initialGuesses, ptParams, squaredErrorComplex);
 
   double tol = 1e-7;
 
@@ -169,8 +169,8 @@ TEST(ParallelTempering, fitComplexFunctionWithPhase){
   std::vector<StringDoubleMap> initialGuesses(ptParams.temperatures.size());
   std::fill(initialGuesses.begin(), initialGuesses.end(), initialGuess_0);
   
-  StringDoubleMap fittedParams = fit<double, std::complex<double>>(pointsX, pointsY, complexExponential,
-                                                                   initialGuesses, ptParams, squaredErrorComplex);
+  StringDoubleMap fittedParams = fit<double, std::complex<double>, StringDoubleMap>(pointsX, pointsY, complexExponential,
+                                                                                    initialGuesses, ptParams, squaredErrorComplex);
 
   double tol = 1e-7;
 
