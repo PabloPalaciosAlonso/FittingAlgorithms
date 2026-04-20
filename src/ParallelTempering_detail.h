@@ -223,16 +223,16 @@ namespace FittingAlgorithms{
                          CostFunction<T2> costFunc,
                          StringDoubleMap &extraParameters){
       
-      double oldError           = computeAverageError(xdata, ydata, model,
-                                                      fittingParameters,
-                                                      costFunc, extraParameters);
+      double oldError           = computeAverageError<T1, T2, T3>(xdata, ydata, model,
+                                                                  fittingParameters,
+                                                                  costFunc, extraParameters);
       
       StringDoubleMap newFittingParameters = proposeNewFittingParameters(fittingParameters, jumpSize);
       
-      double newError             = computeAverageError(xdata, ydata, model,
-                                                        newFittingParameters,
-                                                        costFunc, extraParameters);
-
+      double newError             = computeAverageError<T1, T2, T3>(xdata, ydata, model,
+                                                                    newFittingParameters,
+                                                                    costFunc, extraParameters);
+      
       updateFittingParameters(fittingParameters, newFittingParameters,
                               oldError, newError, temperature, jumpSize);
       
