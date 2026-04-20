@@ -80,10 +80,10 @@ struct Parameters {
 #pragma omp parallel for num_threads(params.numThreads)
 #endif
       for (int tempIdx = 0; tempIdx < nTemperatures; ++tempIdx) {
-        errors[tempIdx] = forwardTimeMC(xdata_in, ydata_in, model, allFittingParameters[tempIdx],
-                                        params.temperatures[tempIdx], params.jumpSize[tempIdx],
-                                        costFunction,
-                                        extraParameters);
+        errors[tempIdx] = forwardTimeMC<T1, T2, T3>(xdata_in, ydata_in, model, allFittingParameters[tempIdx],
+                                                    params.temperatures[tempIdx], params.jumpSize[tempIdx],
+                                                    costFunction,
+                                                    extraParameters);
         
         // Update optimal parameters for this temperature
         updateOptimalParameters(tempIdx, errors[tempIdx], optimalErrors,
