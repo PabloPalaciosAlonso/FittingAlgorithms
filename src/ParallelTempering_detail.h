@@ -190,13 +190,13 @@ namespace FittingAlgorithms{
       }
     }
 
-    template<class T1, class T2, class T3 = StringDoubleMap&>
+    template<class T1, class T2, class T3 = StringDoubleMap>
     double computeAverageError(const std::vector<T1>& xdata_in,
                                const std::vector<T2>& ydata_in,
                                const ModelFunction<T1, T2, T3>& model,
                                const StringDoubleMap& fittingParameters,
                                const CostFunction<T2>& costFunction,                               
-                               const T3 extraParameters) {
+                               const T3& extraParameters) {
       
       auto calculateError = [&](const T1& x_element, const T2& y_actual) {
         T2 y_pred = model(x_element, fittingParameters, extraParameters);
@@ -221,7 +221,7 @@ namespace FittingAlgorithms{
                          double temperature,
                          double &jumpSize,
                          CostFunction<T2> costFunc,
-                         StringDoubleMap &extraParameters){
+                         T3& extraParameters){
       
       double oldError           = computeAverageError<T1, T2, T3>(xdata, ydata, model,
                                                                   fittingParameters,
