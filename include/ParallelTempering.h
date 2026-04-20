@@ -53,10 +53,10 @@ struct Parameters {
  *
  * @return StringDoubleMap Estimated model parameters.
  */
-  template <class T1, class T2>
+  template <class T1, class T2, class T3 = StringDoubleMap>
   StringDoubleMap
   fit(std::vector<T1> &xdata_in, std::vector<T2> &ydata_in,
-      ModelFunction<T1, T2> model, std::vector<StringDoubleMap> &initialGuesses,
+      ModelFunction<T1, T2, T3> model, std::vector<StringDoubleMap> &initialGuesses,
       Parameters params = Parameters(), CostFunction<T2> costFunction = squaredError,
       StringDoubleMap extraParameters = StringDoubleMap{}) {
     
