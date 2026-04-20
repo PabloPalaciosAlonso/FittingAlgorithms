@@ -190,10 +190,10 @@ namespace FittingAlgorithms{
       }
     }
 
-    template<class T1, class T2>
+    template<class T1, class T2, class T3 = StringDoubleMap>
     double computeAverageError(const std::vector<T1>& xdata_in,
                                const std::vector<T2>& ydata_in,
-                               const ModelFunction<T1, T2>& model,
+                               const ModelFunction<T1, T2, T3>& model,
                                const StringDoubleMap& fittingParameters,
                                const CostFunction<T2>& costFunction,                               
                                const StringDoubleMap& extraParameters) {
